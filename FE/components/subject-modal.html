@@ -1,0 +1,41 @@
+<div id="subjectModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">Thông tin Môn học</h2>
+            <span class="close-btn" onclick="closeModal('subjectModal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="subjectForm" class="form">
+                <input type="hidden" id="subjectId" name="subjectId">
+
+                <div class="form-group">
+                    <label for="subject_name">Tên môn học</label>
+                    <input type="text" id="subject_name" name="subject_name" placeholder="Ví dụ: Toán học" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="subject_code">Mã môn học</label>
+                    <input type="text" id="subject_code" name="subject_code" placeholder="Ví dụ: TOAN10" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="credits">Số tín chỉ/tiết</label>
+                    <input type="number" id="credits" name="credits" min="1" placeholder="Ví dụ: 3" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="status">Trạng thái</label>
+                    <select id="status" name="status">
+                        <option value="active">Đang áp dụng</option>
+                        <option value="inactive">Không áp dụng</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal('subjectModal')">Hủy</button>
+                    <button type="submit" class="btn-submit">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

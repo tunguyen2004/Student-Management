@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm điểm</title>
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 30px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+            padding: 24px;
+            margin-top: 5%;
+
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #0f172a;
+        }
+
+        /* Thanh lọc */
+        .filter-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            background: #eef2f6;
+            padding: 16px;
+            border-radius: 10px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .filter-bar label {
+            font-weight: 600;
+            margin-right: 6px;
+        }
+
+        .filter-bar select {
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            font-size: 15px;
+            background: white;
+        }
+
+        /* Bảng điểm */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        th,
+        td {
+            border: 1px solid #e2e8f0;
+            padding: 10px;
+        }
+
+        th {
+            background: #3b82f6;
+            color: white;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #f9fafb;
+        }
+
+        tbody tr:hover {
+            background: #f1f5f9;
+        }
+
+        input.score-input {
+            width: 60px;
+            padding: 6px;
+            text-align: center;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .save-btn {
+            background: #16a34a;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .save-btn:hover {
+            background: #15803d;
+        }
+
+        .back-btn {
+            background: #64748b;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- HEADER -->
+    <header class="topbar">
+        <div class="logo">
+            <img src="/assets/img/icons/logowebhs.png" alt="logo"
+                style="height:40px;width:auto;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.08);margin-right:10px;">
+            <span style="font-size:20px;font-weight:700;letter-spacing:1px;color:#fff;">MinhThu</span>
+        </div>
+
+        <nav class="menu">
+            <a href="/pages/teacher/dashboard.html" class="menu-link">Tổng quan</a>
+            <a href="/pages/teacher/teaching-list.html" class="menu-link">Phân công giảng dạy</a>
+            <a href="/pages/teacher/grades/list.html" class="menu-link active">Quản lý điểm</a>
+            <a href="/pages/teacher/subject-statistics.html" class="menu-link">Thống kê môn học</a>
+        </nav>
+
+        <div class="user-section">
+            <span>Xin chào, <strong>GV. Nguyễn Văn A</strong></span>
+            <button class="logout-btn" onclick="logout()">Đăng xuất</button>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <main>
+        <h2>➕ Thêm điểm môn học</h2>
+
+        <!-- Bộ lọc -->
+        <div class="filter-bar">
+            <div>
+                <label for="year">Năm học:</label>
+                <select id="year">
+                    <option>2025–2026</option>
+                    <option>2024–2025</option>
+                </select>
+            </div>
+            <div>
+                <label for="semester">Kỳ:</label>
+                <select id="semester">
+                    <option>1</option>
+                    <option>2</option>
+                </select>
+            </div>
+            <div>
+                <label for="subject">Môn học:</label>
+                <select id="subject">
+                    <option>Toán</option>
+                    <option>Ngữ văn</option>
+                    <option>Vật lý</option>
+                </select>
+            </div>
+            <div>
+                <label for="class">Lớp:</label>
+                <select id="class">
+                    <option>10A1</option>
+                    <option>10A2</option>
+                    <option>10A3</option>
+                </select>
+            </div>
+            <div>
+                <button class="save-btn" onclick="loadStudents()">Tải danh sách 🔍</button>
+            </div>
+        </div>
+
+        <!-- Bảng nhập điểm -->
+        <table id="score-table">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Họ và tên</th>
+                    <th>Miệng</th>
+                    <th>15 phút</th>
+                    <th>1 tiết</th>
+                    <th>Thi</th>
+                    <th>Trung bình</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- sẽ được tạo tự động -->
+            </tbody>
+        </table>
+
+        <!-- Nút hành động -->
+        <div class="actions">
+            <button class="back-btn" onclick="window.location.href='/pages/teacher/grades/list.html'">↩️ Quay
+                lại</button>
+            <button class="save-btn" onclick="saveScores()">💾 Lưu điểm mới</button>
+        </div>
+    </main>
+
+
+
+    <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script>
+        const students = [
+            { id: 1, name: "Nguyễn Văn An" },
+            { id: 2, name: "Trần Thị Bình" },
+            { id: 3, name: "Lê Hoàng Cường" },
+        ];
+
+        // Tải danh sách học sinh
+        function loadStudents() {
+            const tbody = document.querySelector("#score-table tbody");
+            tbody.innerHTML = "";
+            students.forEach((s, index) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${s.name}</td>
+          <td><input type="number" min="0" max="10" class="score-input" oninput="updateAverage(this)"></td>
+          <td><input type="number" min="0" max="10" class="score-input" oninput="updateAverage(this)"></td>
+          <td><input type="number" min="0" max="10" class="score-input" oninput="updateAverage(this)"></td>
+          <td><input type="number" min="0" max="10" class="score-input" oninput="updateAverage(this)"></td>
+          <td class="avg-cell">-</td>
+        `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Cập nhật điểm trung bình khi nhập
+        function updateAverage(input) {
+            const row = input.closest("tr");
+            const scores = [...row.querySelectorAll(".score-input")].map(i => parseFloat(i.value) || 0);
+            const avg = (scores[0] + scores[1] + scores[2] * 2 + scores[3] * 3) / 7;
+            row.querySelector(".avg-cell").textContent = avg ? avg.toFixed(1) : "-";
+        }
+
+        // Lưu điểm
+        function saveScores() {
+            const rows = document.querySelectorAll("#score-table tbody tr");
+            const result = [];
+            rows.forEach(r => {
+                const name = r.children[1].textContent;
+                const scores = [...r.querySelectorAll(".score-input")].map(i => i.value);
+                result.push({ name, scores });
+            });
+            alert("Đã lưu điểm mới cho " + result.length + " học sinh 🎉");
+            console.log(result);
+        }
+    </script>
+</body>
+
+</html>

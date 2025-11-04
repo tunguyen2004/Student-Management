@@ -1,0 +1,103 @@
+<div id="studentModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">Thông tin Học sinh</h2>
+            <span class="close-btn" onclick="closeModal('studentModal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="studentForm" class="form">
+                <input type="hidden" id="studentId" name="studentId">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="student_code">Mã học sinh</label>
+                        <input type="text" id="student_code" name="student_code" placeholder="Ví dụ: HS001" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="full_name">Họ và tên</label>
+                        <input type="text" id="full_name" name="full_name" placeholder="Ví dụ: Nguyễn Văn A" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="date_of_birth">Ngày sinh</label>
+                        <input type="date" id="date_of_birth" name="date_of_birth">
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">Giới tính</label>
+                        <select id="gender" name="gender">
+                            <option value="male">Nam</option>
+                            <option value="female">Nữ</option>
+                            <option value="other">Khác</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Địa chỉ</label>
+                    <input type="text" id="address" name="address" placeholder="Ví dụ: 123 Đường ABC, Quận XYZ, TP HCM">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" placeholder="Ví dụ: nguyenvana@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Số điện thoại</label>
+                        <input type="tel" id="phone" name="phone" placeholder="Ví dụ: 09xxxxxxxx">
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="class_id">Lớp</label>
+                        <select id="class_id" name="class_id" required>
+                            <option value="" disabled selected>Chọn lớp</option>
+                            <!-- Options will be loaded dynamically -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="enrollment_date">Ngày nhập học</label>
+                        <input type="date" id="enrollment_date" name="enrollment_date">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="status">Trạng thái</label>
+                    <select id="status" name="status">
+                        <option value="studying">Đang học</option>
+                        <option value="dropped_out">Đã nghỉ học</option>
+                        <option value="graduated">Đã tốt nghiệp</option>
+                    </select>
+                </div>
+
+                <hr>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="parent_name">Tên phụ huynh</label>
+                        <input type="text" id="parent_name" name="parent_name" placeholder="Ví dụ: Nguyễn Văn B">
+                    </div>
+                    <div class="form-group">
+                        <label for="parent_phone">SĐT phụ huynh</label>
+                        <input type="tel" id="parent_phone" name="parent_phone" placeholder="Ví dụ: 09xxxxxxxx">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">Ghi chú</label>
+                    <textarea id="notes" name="notes" rows="3" placeholder="Thêm ghi chú nếu có..."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal('studentModal')">Hủy</button>
+                    <button type="submit" class="btn-submit">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

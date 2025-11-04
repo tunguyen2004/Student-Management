@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng điều khiển | Giáo viên</title>
+    <link rel="stylesheet" href="/assets/css/main.css">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+
+
+        main {
+            padding: 100px 30px 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+        }
+
+        .card h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            font-size: 28px;
+            color: #2563eb;
+            font-weight: bold;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- HEADER -->
+    <header class="topbar">
+        <div class="logo">
+            <img src="/assets/img/icons/logowebhs.png" alt="logo"
+                style="height:40px;width:auto;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.08);margin-right:10px;">
+            <span style="font-size:20px;font-weight:700;letter-spacing:1px;color:#fff;">MinhThu</span>
+        </div>
+        <nav class="menu">
+            <a href="/pages/teacher/dashboard.html" class="menu-link active">Tổng quan</a>
+            <a href="/pages/teacher/teaching-list.html" class="menu-link">Phân công giảng dạy</a>
+            <!-- <a href="/pages/teacher/class-students.html" class="menu-link">Danh sách học sinh</a> -->
+            <a href="/pages/teacher/grades/list.html" class="menu-link">Quản lý điểm</a>
+            <a href="/pages/teacher/subject-statistics.html" class="menu-link">Thống kê môn học</a>
+        </nav>
+
+        <div class="user-section">
+            <span>Xin chào, <strong>GV. Nguyễn Văn A</strong></span>
+            <button class="logout-btn" onclick="logout()">Đăng xuất</button>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <main>
+        <div class="page-title">📊 Tổng quan giảng dạy</div>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3>Lớp đang dạy</h3>
+                <p>3</p>
+            </div>
+            <div class="card">
+                <h3>Môn phụ trách</h3>
+                <p>2</p>
+            </div>
+            <div class="card">
+                <h3>Tổng học sinh</h3>
+                <p>105</p>
+            </div>
+            <div class="card">
+                <h3>Tỷ lệ hoàn thành điểm</h3>
+                <p>92%</p>
+            </div>
+        </div>
+    </main>
+
+
+    <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/auth.js"></script>
+</body>
+
+</html>

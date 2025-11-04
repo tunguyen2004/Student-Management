@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng điều khiển | Admin</title>
+    <link rel="stylesheet" href="/assets/css/main.css">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e293b;
+            color: #fff;
+            padding: 10px 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            height: 60px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .menu {
+            display: flex;
+            gap: 15px;
+        }
+
+        .menu-link {
+            color: #e2e8f0;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .menu-link:hover {
+            background: #334155;
+        }
+
+        .menu-link.active {
+            background: #2563eb;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logout-btn {
+            background: #e74c3c;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+
+        main {
+            padding: 100px 30px 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .stat-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .card h3 {
+            margin: 0 0 8px;
+            font-size: 18px;
+            font-weight: 500;
+            color: #475569;
+        }
+
+        .card p {
+            font-size: 36px;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .chart-container {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 992px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- HEADER -->
+    <header class="topbar">
+        <div class="logo">
+            <img src="/assets/img/icons/logowebhs.png" alt="logo"
+                style="height:40px;width:auto;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.08);margin-right:10px;">
+            <span style="font-size:20px;font-weight:700;letter-spacing:1px;color:#fff;">MinhThu</span>
+        </div>
+
+        <nav class="menu">
+            <a href="/pages/admin/dashboard.html" class="menu-link active">Dashboard</a>
+            <a href="/pages/admin/teachers/list.html" class="menu-link">Giáo viên</a>
+            <a href="/pages/admin/students/list.html" class="menu-link">Học sinh</a>
+            <a href="/pages/admin/classes/list.html" class="menu-link">Lớp học</a>
+            <a href="/pages/admin/subjects/list.html" class="menu-link">Môn học</a>
+            <a href="/pages/admin/teaching/assignment.html" class="menu-link">Phân công</a>
+            <a href="/pages/admin/reports/class-statistics.html" class="menu-link">Báo cáo</a>
+        </nav>
+
+        <div class="user-section">
+            <span>Xin chào, <strong>Admin</strong></span>
+            <button class="logout-btn" onclick="logout()">Đăng xuất</button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <div class="page-title">📊 Bảng điều khiển</div>
+
+        <div class="stat-cards">
+            <div class="card">
+                <h3>Học sinh</h3>
+                <p id="student-count">0</p>
+            </div>
+            <div class="card">
+                <h3>Giáo viên</h3>
+                <p id="teacher-count">0</p>
+            </div>
+            <div class="card">
+                <h3>Lớp học</h3>
+                <p id="class-count">0</p>
+            </div>
+            <div class="card">
+                <h3>Môn học</h3>
+                <p id="subject-count">0</p>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-container">
+                <canvas id="studentsByGradeChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="genderDistributionChart"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/admin/dashboard.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', initializeDashboard);
+    </script>
+</body>
+
+</html>

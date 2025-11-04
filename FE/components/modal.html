@@ -1,0 +1,71 @@
+<div id="teacherModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">Thông tin Giáo viên</h2>
+            <span class="close-btn" onclick="closeModal('teacherModal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="teacherForm" class="form">
+                <input type="hidden" id="teacherId" name="teacherId">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="teacher_code">Mã giáo viên</label>
+                        <input type="text" id="teacher_code" name="teacher_code" placeholder="Ví dụ: GV001" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="full_name">Họ và tên</label>
+                        <input type="text" id="full_name" name="full_name" placeholder="Ví dụ: Nguyễn Thị B" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="username">Tên đăng nhập</label>
+                        <input type="text" id="username" name="username" placeholder="Dùng để đăng nhập hệ thống" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Mật khẩu</label>
+                        <input type="password" id="password" name="password" placeholder="Để trống nếu không đổi">
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" placeholder="vi.du@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Số điện thoại</label>
+                        <input type="tel" id="phone" name="phone" placeholder="09xxxxxxxx">
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="specialization">Chuyên môn</label>
+                        <input type="text" id="specialization" name="specialization" placeholder="Ví dụ: Cử nhân Sư phạm Toán">
+                    </div>
+                    <div class="form-group">
+                        <label for="degree">Bằng cấp</label>
+                        <input type="text" id="degree" name="degree" placeholder="Ví dụ: Thạc sĩ">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="start_date">Ngày bắt đầu công tác</label>
+                    <input type="date" id="start_date" name="start_date">
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal('teacherModal')">Hủy</button>
+                    <button type="submit" class="btn-submit">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

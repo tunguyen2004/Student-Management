@@ -1,0 +1,73 @@
+<div id="classModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">Thông tin Lớp học</h2>
+            <span class="close-btn" onclick="closeModal('classModal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="classForm" class="form">
+                <input type="hidden" id="classId" name="classId">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="class_code">Mã lớp</label>
+                        <input type="text" id="class_code" name="class_code" placeholder="Ví dụ: 10A1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="class_name">Tên lớp</label>
+                        <input type="text" id="class_name" name="class_name" placeholder="Ví dụ: Lớp 10A1" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="grade">Khối</label>
+                        <select id="grade" name="grade" required>
+                            <option value="" disabled selected>Chọn khối</option>
+                            <option value="10">Khối 10</option>
+                            <option value="11">Khối 11</option>
+                            <option value="12">Khối 12</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="school_year">Năm học</label>
+                        <input type="text" id="school_year" name="school_year" placeholder="Ví dụ: 2024-2025" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="room_number">Phòng học</label>
+                        <input type="text" id="room_number" name="room_number" placeholder="Ví dụ: P.101">
+                    </div>
+                    <div class="form-group">
+                        <label for="max_students">Sĩ số tối đa</label>
+                        <input type="number" id="max_students" name="max_students" min="1" placeholder="Ví dụ: 45">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="homeroom_teacher_id">Giáo viên chủ nhiệm</label>
+                        <select id="homeroom_teacher_id" name="homeroom_teacher_id">
+                            <option value="" disabled selected>Chọn giáo viên</option>
+                            <!-- Tải danh sách giáo viên ở đây -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Trạng thái</label>
+                        <select id="status" name="status">
+                            <option value="active">Hoạt động</option>
+                            <option value="inactive">Không hoạt động</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal('classModal')">Hủy</button>
+                    <button type="submit" class="btn-submit">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
