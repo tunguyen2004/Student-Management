@@ -57,7 +57,7 @@ function getTeacherById(id) {
 
 function updateTeacher(id, teacherData) {
   return fetchFromAPI(`teachers/${id}`, {
-    method: "PUT",
+    method: "PATCH",
     body: JSON.stringify(teacherData),
   });
 }

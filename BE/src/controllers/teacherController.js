@@ -1,5 +1,6 @@
 const { User, Teacher, sequelize } = require("../models");
 const bcrypt = require("bcryptjs");
+const { Op } = require("sequelize"); // ✅ thêm dòng này
 
 // @desc    Get all teachers
 // @route   GET /api/teachers
@@ -51,7 +52,6 @@ exports.getTeacherById = async (req, res) => {
 // @access  Admin
 exports.createTeacher = async (req, res) => {
   const {
-    // User fields
     username,
     password,
     full_name,
@@ -60,8 +60,6 @@ exports.createTeacher = async (req, res) => {
     address,
     date_of_birth,
     gender,
-    // Teacher fields
-    teacher_code,
     specialization,
     degree,
     start_date,
@@ -71,47 +69,49 @@ exports.createTeacher = async (req, res) => {
     notes,
   } = req.body;
 
-  // Basic validation
-  if (!username || !password || !full_name || !teacher_code) {
-    return res
-      .status(400)
-      .json({
-        msg: "Please provide username, password, full_name, and teacher_code",
-      });
+  if (!username || !password || !full_name) {
+    return res.status(400).json({
+      msg: "Please provide username, password, full_name",
+    });
   }
 
   try {
     const result = await sequelize.transaction(async (t) => {
-      // Check if username or email already exists
       const userExists = await User.findOne({
         where: { username },
         transaction: t,
       });
-      if (userExists) {
-        throw new Error("Username already exists");
-      }
-      if (email) {
-        const emailExists = await User.findOne({
-          where: { email },
-          transaction: t,
-        });
-        if (emailExists) {
-          throw new Error("Email already exists");
-        }
-      }
-      const teacherCodeExists = await Teacher.findOne({
-        where: { teacher_code },
+      if (userExists) throw new Error("Username already exists");
+
+      // ✅ Tự sinh teacher_code theo năm
+      const year = start_date
+        ? new Date(start_date).getFullYear()
+        : new Date().getFullYear();
+      const yearShort = year.toString().slice(-2);
+
+      const lastTeacher = await Teacher.findOne({
+        where: {
+          teacher_code: {
+            [Op.like]: `GV${yearShort}-%`,
+          },
+        },
+        order: [["id", "DESC"]],
         transaction: t,
       });
-      if (teacherCodeExists) {
-        throw new Error("Teacher code already exists");
+
+      let nextCode = `GV${yearShort}-0001`;
+
+      if (lastTeacher?.teacher_code) {
+        const lastNumber = parseInt(lastTeacher.teacher_code.split("-")[1]);
+        nextCode = `GV${yearShort}-${(lastNumber + 1)
+          .toString()
+          .padStart(4, "0")}`;
       }
 
-      // Hash password
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
+      // ✅ Hash mật khẩu
+      const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Create user
+      // 1️⃣ Tạo user
       const newUser = await User.create(
         {
           username,
@@ -127,11 +127,11 @@ exports.createTeacher = async (req, res) => {
         { transaction: t }
       );
 
-      // Create teacher
-      await Teacher.create(
+      // 2️⃣ Tạo teacher
+      const newTeacher = await Teacher.create(
         {
           user_id: newUser.id,
-          teacher_code,
+          teacher_code: nextCode, // ✅ auto code here
           specialization,
           degree,
           start_date,
@@ -143,40 +143,30 @@ exports.createTeacher = async (req, res) => {
         { transaction: t }
       );
 
-      // Re-fetch the created profile to return
-      const createdProfile = await User.findByPk(newUser.id, {
-        attributes: { exclude: ["password"] },
-        include: [{ model: Teacher, required: true }],
-        transaction: t,
-      });
-
-      return createdProfile;
+      return {
+        message: "Teacher created successfully",
+        user: newUser,
+        teacher: newTeacher,
+      };
     });
 
-    res.status(201).json(result);
+    return res.status(201).json(result);
   } catch (err) {
     console.error(err.message);
-    // Return specific error messages from the transaction
-
-    res.status(500).send("Server Error");
+    res.status(500).json({ msg: err.message || "Server Error" });
   }
 };
 
 // @desc    Update a teacher
-// @route   PUT /api/teachers/:id
+// @route   PATCH /api/teachers/:id
 // @access  Admin
 exports.updateTeacher = async (req, res) => {
   const { id } = req.params;
-  // Destructure allowed fields
-  const {
-    full_name,
-    email,
-    phone,
-    address,
-    date_of_birth,
-    gender,
-    is_active,
-  } = req.body;
+
+  // User fields cho update
+  const { full_name, email, phone, address, date_of_birth, gender, is_active } =
+    req.body;
+
   const userFields = {
     full_name,
     email,
@@ -187,6 +177,7 @@ exports.updateTeacher = async (req, res) => {
     is_active,
   };
 
+  // Teacher fields — KHÔNG BAO GỒM teacher_code
   const {
     specialization,
     degree,
@@ -196,6 +187,7 @@ exports.updateTeacher = async (req, res) => {
     bank_name,
     notes,
   } = req.body;
+
   const teacherFields = {
     specialization,
     degree,
@@ -206,7 +198,7 @@ exports.updateTeacher = async (req, res) => {
     notes,
   };
 
-  // Filter out undefined fields
+  // Xóa field undefined
   Object.keys(userFields).forEach(
     (key) => userFields[key] === undefined && delete userFields[key]
   );
@@ -220,30 +212,28 @@ exports.updateTeacher = async (req, res) => {
         where: { id, role: "teacher" },
         transaction: t,
       });
-      if (!user) {
-        throw new Error("Teacher not found");
-      }
 
-      // Update user fields
+      if (!user) throw new Error("Teacher not found");
+
+      // ✅ Update bảng users
       if (Object.keys(userFields).length > 0) {
         await user.update(userFields, { transaction: t });
       }
 
-      // Update teacher fields
-      if (Object.keys(teacherFields).length > 0) {
-        const teacher = await Teacher.findOne({
-          where: { user_id: id },
-          transaction: t,
-        });
-        if (teacher) {
-          await teacher.update(teacherFields, { transaction: t });
-        }
+      // ✅ Update bảng teachers — KHÔNG update teacher_code
+      const teacher = await Teacher.findOne({
+        where: { user_id: id },
+        transaction: t,
+      });
+
+      if (teacher && Object.keys(teacherFields).length > 0) {
+        await teacher.update(teacherFields, { transaction: t });
       }
 
-      // Re-fetch the full profile to return
+      // ✅ Fetch lại đầy đủ để trả về FE
       const updatedProfile = await User.findByPk(id, {
         attributes: { exclude: ["password"] },
-        include: [{ model: Teacher, required: true }],
+        include: [{ model: Teacher }],
         transaction: t,
       });
 
@@ -253,8 +243,7 @@ exports.updateTeacher = async (req, res) => {
     res.json(result);
   } catch (err) {
     console.error(err.message);
-
-    res.status(500).send("Server Error");
+    res.status(500).json({ msg: err.message || "Server Error" });
   }
 };
 
@@ -280,4 +269,3 @@ exports.deleteTeacher = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
-

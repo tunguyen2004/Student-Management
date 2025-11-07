@@ -32,7 +32,6 @@ async function loadTeachers() {
                     <td>${teacher.Teacher.specialization}</td>
                     <td class="actions">
                         <button onclick="handleEditTeacher(${teacher.id})">✏️ Sửa</button>
-                        <button onclick="handleResetPassword(${teacher.id})">🔑 Reset</button>
                         <button onclick="handleDeleteTeacher(${teacher.id})">🗑️ Xóa</button>
                     </td>
                 </tr>
@@ -96,18 +95,31 @@ async function handleEditTeacher(id) {
     const form = document.getElementById("teacherForm");
     if (form) {
       document.getElementById("teacherId").value = teacher.id;
+      document.getElementById("teacher_code").value =
+        teacher.Teacher.teacher_code;
       document.getElementById("username").value = teacher.username;
       document.getElementById("full_name").value = teacher.full_name;
       document.getElementById("email").value = teacher.email;
       document.getElementById("phone").value = teacher.phone;
-      document.getElementById("teacher_code").value =
-        teacher.Teacher.teacher_code;
+      document.getElementById("address").value = teacher.address || "";
+      document.getElementById("date_of_birth").value =
+        teacher.date_of_birth?.split("T")[0] || "";
+      document.getElementById("gender").value = teacher.gender || "male";
+
       document.getElementById("specialization").value =
-        teacher.Teacher.specialization;
-      document.getElementById("degree").value = teacher.Teacher.degree;
-      document.getElementById("start_date").value = teacher.Teacher.start_date
-        ? teacher.Teacher.start_date.split("T")[0]
-        : "";
+        teacher.Teacher.specialization || "";
+      document.getElementById("degree").value = teacher.Teacher.degree || "";
+      document.getElementById("start_date").value =
+        teacher.Teacher.start_date?.split("T")[0] || "";
+
+      document.getElementById("bank_name").value =
+        teacher.Teacher.bank_name || "";
+      document.getElementById("bank_account").value =
+        teacher.Teacher.bank_account || "";
+      document.getElementById("salary").value = teacher.Teacher.salary || "";
+      document.getElementById("notes").value = teacher.Teacher.notes || "";
+
+      document.getElementById("password").value = ""; // không show pass
 
       // The password field should be cleared for security
       document.getElementById("password").value = "";
@@ -127,10 +139,19 @@ async function handleFormSubmit(event) {
     full_name: document.getElementById("full_name").value,
     email: document.getElementById("email").value,
     phone: document.getElementById("phone").value,
+    address: document.getElementById("address").value,
+    date_of_birth: document.getElementById("date_of_birth").value,
+    gender: document.getElementById("gender").value,
+
+    // Teacher table
     teacher_code: document.getElementById("teacher_code").value,
     specialization: document.getElementById("specialization").value,
     degree: document.getElementById("degree").value,
     start_date: document.getElementById("start_date").value,
+    bank_name: document.getElementById("bank_name").value,
+    bank_account: document.getElementById("bank_account").value,
+    salary: document.getElementById("salary").value,
+    notes: document.getElementById("notes").value,
   };
 
   const password = document.getElementById("password").value;
@@ -154,9 +175,9 @@ async function handleFormSubmit(event) {
   }
 }
 
-function handleResetPassword(id) {
-  alert("Chức năng reset mật khẩu cho giáo viên: " + id);
-}
+// function handleResetPassword(id) {
+//   alert("Chức năng reset mật khẩu cho giáo viên: " + id);
+// }
 
 async function handleDeleteTeacher(id) {
   if (confirm("Bạn có chắc muốn xóa giáo viên này không?")) {
