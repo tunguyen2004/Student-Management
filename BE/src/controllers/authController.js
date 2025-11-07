@@ -197,7 +197,7 @@ exports.register = async (req, res) => {
     jwt.sign(
       payload,
       process.env.JWT_SECRET,
-      { expiresIn: "15m" }, // Changed to 15 minutes
+      { expiresIn: "1h" }, // Changed to 1 hour
       (err, token) => {
         if (err) {
           console.error("JWT Error:", err);
@@ -298,7 +298,7 @@ exports.login = async (req, res) => {
     jwt.sign(
       payload,
       process.env.JWT_SECRET,
-      { expiresIn: "15m" },
+      { expiresIn: "1h" },
       (err, token) => {
         if (err) {
           console.error("JWT Error:", err);

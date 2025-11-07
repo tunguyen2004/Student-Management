@@ -113,7 +113,7 @@ function createStudent(studentData) {
 
 function updateStudent(id, studentData) {
   return fetchFromAPI(`students/${id}`, {
-    method: "PUT",
+    method: "PATCH",
     body: JSON.stringify(studentData),
   });
 }

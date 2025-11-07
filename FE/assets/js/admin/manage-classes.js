@@ -6,6 +6,18 @@ function initializeClassManagement() {
     classForm.addEventListener("submit", handleFormSubmit);
   }
 }
+function openModal(modalId, title = "Thông tin") {
+  const modal = document.getElementById(modalId);
+  const modalTitle = modal.querySelector("#modalTitle");
+
+  modal.style.display = "flex"; // show modal, center
+  modalTitle.textContent = title; // set title
+}
+
+function closeModal(modalId) {
+  const modal = document.getElementById(modalId);
+  modal.style.display = "none";
+}
 
 async function loadClasses() {
   try {
@@ -69,62 +81,63 @@ async function loadClasses() {
 }
 
 async function loadTeachersForDropdown() {
-    try {
-        const response = await getTeachers();
-        const teacherList = response.data || response; // Defensive check
+  try {
+    const response = await getTeachers();
+    const teacherList = response.data || response; // Defensive check
 
-        const teacherSelect = document.getElementById('homeroom_teacher_id');
-        if (teacherSelect) {
-            teacherSelect.innerHTML = '<option value="">-- Chọn GVCN --</option>';
-            
-            if (Array.isArray(teacherList)) {
-                teacherList.forEach(teacher => {
-                    const option = document.createElement('option');
-                    option.value = teacher.id; 
-                    option.textContent = teacher.full_name;
-                    teacherSelect.appendChild(option);
-                });
-            }
-        }
-    } catch (error) {
-        console.error('Lỗi khi tải danh sách giáo viên:', error);
+    const teacherSelect = document.getElementById("homeroom_teacher_id");
+    if (teacherSelect) {
+      teacherSelect.innerHTML = '<option value="">-- Chọn GVCN --</option>';
+
+      if (Array.isArray(teacherList)) {
+        teacherList.forEach((teacher) => {
+          const option = document.createElement("option");
+          option.value = teacher.id;
+          option.textContent = teacher.full_name;
+          teacherSelect.appendChild(option);
+        });
+      }
     }
+  } catch (error) {
+    console.error("Lỗi khi tải danh sách giáo viên:", error);
+  }
 }
 
 async function handleAddClass() {
-    const form = document.getElementById('classForm');
-    if (form) {
-        form.reset();
-        document.getElementById('classId').value = '';
-    }
-    await loadTeachersForDropdown();
-    openModal('classModal', 'Thêm lớp học mới');
+  const form = document.getElementById("classForm");
+  if (form) {
+    form.reset();
+    document.getElementById("classId").value = "";
+  }
+  await loadTeachersForDropdown();
+  openModal("classModal", "Thêm lớp học mới");
 }
 
 async function handleEditClass(id) {
-    try {
-        const response = await getClassById(id);
-        const cls = response.data || response; // Defensively get the actual class object
+  try {
+    const response = await getClassById(id);
+    const cls = response.data || response; // Defensively get the actual class object
 
-        const form = document.getElementById('classForm');
-        if (form) {
-            document.getElementById('classId').value = cls.id;
-            document.getElementById('class_code').value = cls.class_code;
-            document.getElementById('class_name').value = cls.class_name;
-            document.getElementById('grade').value = cls.grade;
-            document.getElementById('school_year').value = cls.school_year;
-            document.getElementById('room_number').value = cls.room_number || '';
-            document.getElementById('max_students').value = cls.max_students || '';
-            document.getElementById('status').value = cls.status || 'active';
-            
-            await loadTeachersForDropdown();
-            document.getElementById('homeroom_teacher_id').value = cls.homeroom_teacher_id || '';
-        }
-        openModal('classModal', 'Cập nhật thông tin lớp học');
-    } catch (error) {
-        console.error(`Lỗi khi lấy thông tin lớp học ${id}:`, error);
-        alert('Không thể tải thông tin lớp học.');
+    const form = document.getElementById("classForm");
+    if (form) {
+      document.getElementById("classId").value = cls.id;
+      document.getElementById("class_code").value = cls.class_code;
+      document.getElementById("class_name").value = cls.class_name;
+      document.getElementById("grade").value = cls.grade;
+      document.getElementById("school_year").value = cls.school_year;
+      document.getElementById("room_number").value = cls.room_number || "";
+      document.getElementById("max_students").value = cls.max_students || "";
+      document.getElementById("status").value = cls.status || "active";
+
+      await loadTeachersForDropdown();
+      document.getElementById("homeroom_teacher_id").value =
+        cls.homeroom_teacher_id || "";
     }
+    openModal("classModal", "Cập nhật thông tin lớp học");
+  } catch (error) {
+    console.error(`Lỗi khi lấy thông tin lớp học ${id}:`, error);
+    alert("Không thể tải thông tin lớp học.");
+  }
 }
 
 async function handleFormSubmit(event) {

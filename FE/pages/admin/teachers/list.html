@@ -216,11 +216,19 @@
     <script src="/assets/js/main.js"></script>
     <script src="/assets/js/auth.js"></script>
     <script src="/assets/js/api.js"></script>
-    <script src="/assets/js/admin/manage-teachers.js"></script>
+    <!-- <script src="/assets/js/admin/manage-teachers.js"></script> -->
     <script src="/assets/js/include.js"></script>
     <script>
-        includeHTML('modal-container', '/components/modal.html', () => {
-            initializeTeacherManagement();
+        includeHTML("modal-container", "/components/modal.html", () => {
+            const script = document.createElement("script");
+            script.src = "/assets/js/admin/manage-teachers.js";
+
+            script.onload = () => {
+                console.log("manage-teachers.js loaded ✅");
+                initializeTeacherManagement(); // ✅ gọi ở đây để load danh sách
+            };
+
+            document.body.appendChild(script);
         });
     </script>
 </body>

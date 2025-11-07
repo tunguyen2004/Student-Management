@@ -2,7 +2,9 @@
     <div class="modal-content">
         <div class="modal-header">
             <h2 id="modalTitle">Thông tin Giáo viên</h2>
-            <span class="close-btn" onclick="closeModal('teacherModal')">&times;</span>
+            <!-- <span class="close-btn" onclick="closeModal('teacherModal')">&times;</span> -->
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+
         </div>
         <div class="modal-body">
             <form id="teacherForm" class="form">
@@ -22,7 +24,8 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="username">Tên đăng nhập</label>
-                        <input type="text" id="username" name="username" placeholder="Dùng để đăng nhập hệ thống" required>
+                        <input type="text" id="username" name="username" placeholder="Dùng để đăng nhập hệ thống"
+                            required>
                     </div>
                     <div class="form-group">
                         <label for="password">Mật khẩu</label>
@@ -48,7 +51,8 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="specialization">Chuyên môn</label>
-                        <input type="text" id="specialization" name="specialization" placeholder="Ví dụ: Cử nhân Sư phạm Toán">
+                        <input type="text" id="specialization" name="specialization"
+                            placeholder="Ví dụ: Cử nhân Sư phạm Toán">
                     </div>
                     <div class="form-group">
                         <label for="degree">Bằng cấp</label>

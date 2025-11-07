@@ -1,0 +1,53 @@
+<!-- Modal for Add/Edit Teacher -->
+<div id="teacherModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="modalTitle"></h2>
+      <span class="close" onclick="closeModal('teacherModal')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <form id="teacherForm">
+        <input type="hidden" id="teacherId" />
+        <div class="form-group">
+          <label for="username">Tên đăng nhập:</label>
+          <input type="text" id="username" required />
+        </div>
+        <div class="form-group">
+          <label for="full_name">Họ và tên:</label>
+          <input type="text" id="full_name" required />
+        </div>
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" id="email" required />
+        </div>
+        <div class="form-group">
+          <label for="phone">Số điện thoại:</label>
+          <input type="tel" id="phone" />
+        </div>
+        <div class="form-group">
+          <label for="teacher_code">Mã giáo viên:</label>
+          <input type="text" id="teacher_code" required />
+        </div>
+        <div class="form-group">
+          <label for="specialization">Chuyên ngành:</label>
+          <input type="text" id="specialization" />
+        </div>
+        <div class="form-group">
+          <label for="degree">Bằng cấp:</label>
+          <input type="text" id="degree" />
+        </div>
+        <div class="form-group">
+          <label for="start_date">Ngày bắt đầu:</label>
+          <input type="date" id="start_date" />
+        </div>
+        <div class="form-group">
+          <label for="password">Mật khẩu (để trống nếu không thay đổi):</label>
+          <input type="password" id="password" />
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Lưu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -20,6 +20,18 @@ function initializeStudentManagement() {
     classFilter.addEventListener("change", renderStudents);
   }
 }
+function openModal(modalId, title = "Thông tin") {
+  const modal = document.getElementById(modalId);
+  const modalTitle = modal.querySelector("#modalTitle");
+
+  modal.style.display = "flex"; // show modal, center
+  modalTitle.textContent = title; // set title
+}
+
+function closeModal(modalId) {
+  const modal = document.getElementById(modalId);
+  modal.style.display = "none";
+}
 
 function renderStudents() {
   const studentTable = document.getElementById("studentTable");
@@ -55,7 +67,11 @@ function renderStudents() {
                       student.date_of_birth
                     ).toLocaleDateString()}</td>
                     <td>${student.gender === "male" ? "Nam" : "Nữ"}</td>
-                    <td>${student.class ? student.class.class_code : "N/A"}</td>
+                    <td>${
+                      student.Class?.class_name ||
+                      student.Class?.class_code ||
+                      "N/A"
+                    }</td>
                     <td>${student.phone || "N/A"}</td>
                     <td>${student.address || "N/A"}</td>
                     <td>${student.status || "N/A"}</td>
@@ -134,12 +150,20 @@ async function loadClassesForFilterDropdown() {
 }
 
 async function handleAddStudent() {
-  document.getElementById("studentForm").reset();
-  document.getElementById("studentId").value = "";
+  const form = document.getElementById("studentForm");
+  form.reset();
+
+  document.getElementById("studentId").value = ""; // clear ID
+  document.getElementById("student_code").value = ""; // code sẽ auto-gen từ BE
+  document.getElementById("student_code").disabled = true;
+
   await loadClassesForDropdown();
   openModal("studentModal", "Thêm học sinh mới");
 }
 
+/* ===========================
+    ✅ EDIT STUDENT (UPDATE)
+=========================== */
 async function handleEditStudent(id) {
   try {
     const response = await getStudentById(id);
@@ -147,19 +171,20 @@ async function handleEditStudent(id) {
 
     document.getElementById("studentId").value = student.id;
     document.getElementById("student_code").value = student.student_code;
+    document.getElementById("student_code").disabled = true;
+
     document.getElementById("full_name").value = student.full_name;
-    document.getElementById("date_of_birth").value = student.date_of_birth
-      ? student.date_of_birth.split("T")[0]
-      : "";
+    document.getElementById("date_of_birth").value =
+      student.date_of_birth?.split("T")[0] || "";
     document.getElementById("gender").value = student.gender;
+
     document.getElementById("email").value = student.email || "";
     document.getElementById("phone").value = student.phone || "";
     document.getElementById("address").value = student.address || "";
     document.getElementById("parent_name").value = student.parent_name || "";
     document.getElementById("parent_phone").value = student.parent_phone || "";
-    document.getElementById("enrollment_date").value = student.enrollment_date
-      ? student.enrollment_date.split("T")[0]
-      : "";
+    document.getElementById("enrollment_date").value =
+      student.enrollment_date?.split("T")[0] || "";
     document.getElementById("status").value = student.status || "studying";
     document.getElementById("notes").value = student.notes || "";
 
@@ -168,8 +193,48 @@ async function handleEditStudent(id) {
 
     openModal("studentModal", "Cập nhật thông tin học sinh");
   } catch (error) {
-    console.error(`Lỗi khi lấy thông tin học sinh ${id}:`, error);
-    alert("Không thể tải thông tin học sinh.");
+    console.error("❌ Lỗi load dữ liệu học sinh:", error);
+    alert("Không thể tải dữ liệu học sinh.");
+  }
+}
+
+/* ===========================
+    ✅ SUBMIT FORM (CREATE UPDATE)
+=========================== */
+async function handleFormSubmit(event) {
+  event.preventDefault();
+
+  const id = document.getElementById("studentId").value;
+
+  const studentData = {
+    full_name: document.getElementById("full_name").value,
+    date_of_birth: document.getElementById("date_of_birth").value,
+    gender: document.getElementById("gender").value,
+    class_id: Number(document.getElementById("class_id").value),
+    email: document.getElementById("email").value,
+    phone: document.getElementById("phone").value,
+    address: document.getElementById("address").value,
+    parent_name: document.getElementById("parent_name").value,
+    parent_phone: document.getElementById("parent_phone").value,
+    enrollment_date: document.getElementById("enrollment_date").value,
+    status: document.getElementById("status").value,
+    notes: document.getElementById("notes").value,
+  };
+
+  try {
+    if (id) {
+      await updateStudent(id, studentData);
+      alert("✅ Cập nhật học sinh thành công!");
+    } else {
+      await createStudent(studentData);
+      alert("✅ Thêm học sinh thành công!");
+    }
+
+    closeModal("studentModal");
+    loadStudents(); // reload UI
+  } catch (error) {
+    console.error("❌ Lỗi khi lưu:", error);
+    alert("Lỗi khi lưu học sinh.");
   }
 }
 

@@ -1,3 +1,5 @@
+console.log("✅ manage-teachers.js loaded");
+
 function initializeTeacherManagement() {
   loadTeachers();
 
@@ -47,21 +49,34 @@ async function loadTeachers() {
   }
 }
 
-function openModal(title) {
+function openModal(title = "Thông tin giáo viên") {
+  console.log(">>> OPEN MODAL CALLED");
+
   const modal = document.getElementById("teacherModal");
   const modalTitle = document.getElementById("modalTitle");
-  if (modal && modalTitle) {
-    modalTitle.textContent = title;
-    modal.style.display = "block";
-  }
+
+  if (modal) modal.style.display = "flex"; // dùng flex để hiện modal
+  if (modalTitle) modalTitle.textContent = title;
 }
 
 function closeModal() {
   const modal = document.getElementById("teacherModal");
-  if (modal) {
-    modal.style.display = "none";
-  }
+  if (modal) modal.style.display = "none";
 }
+
+// function openModal(title) {
+//   const modal = document.getElementById("teacherModal");
+//   const modalTitle = document.getElementById("modalTitle");
+//   modalTitle.textContent = title;
+//   modal.style.display = "block";
+// }
+
+// function closeModal() {
+//   const modal = document.getElementById("teacherModal");
+//   if (modal) {
+//     modal.style.display = "none";
+//   }
+// }
 
 function handleAddTeacher() {
   const form = document.getElementById("teacherForm");
@@ -74,6 +89,9 @@ function handleAddTeacher() {
 
 async function handleEditTeacher(id) {
   try {
+    console.log(">>> CLICK EDIT");
+    console.log(document.getElementById("teacherModal"));
+
     const teacher = await getTeacherById(id);
     const form = document.getElementById("teacherForm");
     if (form) {
@@ -83,18 +101,18 @@ async function handleEditTeacher(id) {
       document.getElementById("email").value = teacher.email;
       document.getElementById("phone").value = teacher.phone;
       document.getElementById("teacher_code").value =
-        teacher.teacher.teacher_code;
+        teacher.Teacher.teacher_code;
       document.getElementById("specialization").value =
-        teacher.teacher.specialization;
-      document.getElementById("degree").value = teacher.teacher.degree;
-      document.getElementById("start_date").value = teacher.teacher.start_date
-        ? teacher.teacher.start_date.split("T")[0]
+        teacher.Teacher.specialization;
+      document.getElementById("degree").value = teacher.Teacher.degree;
+      document.getElementById("start_date").value = teacher.Teacher.start_date
+        ? teacher.Teacher.start_date.split("T")[0]
         : "";
 
       // The password field should be cleared for security
       document.getElementById("password").value = "";
     }
-    openModal("Cập nhật thông tin giáo viên");
+    window.openModal("Cập nhật thông tin giáo viên");
   } catch (error) {
     console.error(`Lỗi khi lấy thông tin giáo viên ${id}:`, error);
     alert("Không thể tải thông tin giáo viên.");
@@ -152,3 +170,9 @@ async function handleDeleteTeacher(id) {
     }
   }
 }
+
+window.handleEditTeacher = handleEditTeacher;
+window.handleAddTeacher = handleAddTeacher;
+window.handleFormSubmit = handleFormSubmit;
+window.openModal = openModal;
+window.closeModal = closeModal;
