@@ -175,23 +175,33 @@
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgba(0,0,0,0.6);
+            background-color: rgba(0, 0, 0, 0.6);
             align-items: center;
             justify-content: center;
         }
+
         .modal-content {
             background-color: #fff;
             padding: 25px;
             border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             width: 90%;
             max-width: 650px;
             animation: fadeIn 0.3s;
         }
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
+
         .modal-header {
             display: flex;
             justify-content: space-between;
@@ -200,10 +210,12 @@
             padding-bottom: 15px;
             margin-bottom: 20px;
         }
+
         .modal-header h2 {
             margin: 0;
             font-size: 20px;
         }
+
         .close-btn {
             color: #9ca3af;
             font-size: 30px;
@@ -211,24 +223,40 @@
             cursor: pointer;
             transition: color 0.2s;
         }
-        .close-btn:hover, .close-btn:focus { color: #111827; }
 
-        .form-group { margin-bottom: 15px; }
+        .close-btn:hover,
+        .close-btn:focus {
+            color: #111827;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
         .form-group label {
             display: block;
             margin-bottom: 6px;
             font-weight: 600;
             font-size: 14px;
         }
-        .form-group input, .form-group select {
+
+        .form-group input,
+        .form-group select {
             width: 100%;
             padding: 10px;
             border: 1px solid #d1d5db;
             border-radius: 6px;
             font-size: 14px;
         }
-        .form-row { display: flex; gap: 20px; }
-        .form-row .form-group { flex: 1; }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
 
         .schedule-row {
             display: flex;
@@ -236,8 +264,13 @@
             align-items: center;
             margin-bottom: 10px;
         }
-        .schedule-row select { min-width: 120px; }
-        .btn-add-schedule, .btn-remove-schedule {
+
+        .schedule-row select {
+            min-width: 120px;
+        }
+
+        .btn-add-schedule,
+        .btn-remove-schedule {
             border: none;
             border-radius: 5px;
             padding: 8px 12px;
@@ -245,10 +278,24 @@
             font-size: 14px;
             transition: background 0.2s;
         }
-        .btn-add-schedule { background: #dbeafe; color: #1e40af; }
-        .btn-add-schedule:hover { background: #bfdbfe; }
-        .btn-remove-schedule { background: #fee2e2; color: #991b1b; }
-        .btn-remove-schedule:hover { background: #fecaca; }
+
+        .btn-add-schedule {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .btn-add-schedule:hover {
+            background: #bfdbfe;
+        }
+
+        .btn-remove-schedule {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .btn-remove-schedule:hover {
+            background: #fecaca;
+        }
 
         .modal-footer {
             text-align: right;
@@ -256,6 +303,7 @@
             padding-top: 20px;
             margin-top: 25px;
         }
+
         .btn {
             padding: 10px 18px;
             border: none;
@@ -263,20 +311,57 @@
             cursor: pointer;
             font-weight: 600;
         }
-        .btn-primary { background: #2563eb; color: white; }
-        .btn-primary:hover { background: #1d4ed8; }
-        .btn-secondary { background: #e5e7eb; color: #374151; margin-right: 10px; }
-        .btn-secondary:hover { background: #d1d5db; }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+            margin-right: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
 
 
         /* Responsive */
         @media (max-width: 768px) {
-            .topbar { flex-direction: column; height: auto; padding: 10px; }
-            .menu { margin: 10px 0; flex-wrap: wrap; justify-content: center; }
-            main { padding: 120px 15px 30px; }
-            table { font-size: 14px; }
-            th, td { padding: 8px; }
-            .modal-content { margin: 5% auto; }
+            .topbar {
+                flex-direction: column;
+                height: auto;
+                padding: 10px;
+            }
+
+            .menu {
+                margin: 10px 0;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            main {
+                padding: 120px 15px 30px;
+            }
+
+            table {
+                font-size: 14px;
+            }
+
+            th,
+            td {
+                padding: 8px;
+            }
+
+            .modal-content {
+                margin: 5% auto;
+            }
         }
     </style>
 </head>
@@ -296,12 +381,15 @@
             <a href="/pages/admin/students/list.html" class="menu-link"> Học sinh</a>
             <a href="/pages/admin/classes/list.html" class="menu-link"> Lớp học</a>
             <a href="/pages/admin/subjects/list.html" class="menu-link"> Môn học</a>
+            <a href="/pages/admin/scores/list.html" class="menu-link"> Quản lý điểm</a>
             <a href="/pages/admin/teaching/assignment.html" class="menu-link active"> Phân công</a>
             <a href="/pages/admin/reports/class-statistics.html" class="menu-link"> Báo cáo</a>
         </nav>
 
         <div class="user-section">
-            <span>Xin chào, <strong>Admin</strong></span>
+            <a href="/pages/profile/view-profile.html" style="margin-left:15px; color: #fff;text-decoration: none;">
+                <span>Xin chào, <strong>Admin</strong></span>
+            </a>
             <button class="logout-btn" onclick="logout()">Đăng xuất</button>
         </div>
     </header>

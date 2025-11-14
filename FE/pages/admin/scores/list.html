@@ -178,11 +178,14 @@
         </div>
 
         <nav class="menu">
-            <a href="/pages/teacher/dashboard.html" class="menu-link">Tổng quan</a>
-            <a href="/pages/teacher/teaching-list.html" class="menu-link">Phân công giảng dạy</a>
-            <a href="/pages/teacher/class-students.html" class="menu-link">Danh sách học sinh</a>
-            <a href="/pages/teacher/grades/list.html" class="menu-link active">Quản lý điểm</a>
-            <a href="/pages/teacher/subject-statistics.html" class="menu-link">Thống kê môn học</a>
+            <a href="/pages/admin/dashboard.html" class="menu-link">Dashboard</a>
+            <a href="/pages/admin/teachers/list.html" class="menu-link">Giáo viên</a>
+            <a href="/pages/admin/students/list.html" class="menu-link">Học sinh</a>
+            <a href="/pages/admin/classes/list.html" class="menu-link">Lớp học</a>
+            <a href="/pages/admin/subjects/list.html" class="menu-link">Môn học</a>
+            <a href="/pages/admin/scores/list.html" class="menu-link active">Quản lý điểm</a>
+            <a href="/pages/admin/teaching/assignment.html" class="menu-link">Phân công</a>
+            <a href="/pages/admin/reports/class-statistics.html" class="menu-link">Báo cáo</a>
         </nav>
 
         <div class="user-section">
@@ -195,47 +198,46 @@
 
     <!-- MAIN -->
     <main>
-        <h2 class="page-title">📘 Xem điểm điểm học sinh</h2>
+        <h2>📊 Quản lý điểm học sinh</h2>
 
-        <!-- FILTER -->
         <div class="filter-panel">
-            <select id="classSelect" title="Chọn lớp" onchange="loadStudentsAndScores()">
-                <option value="">-- Chọn lớp --</option>
+            <select id="classSelect" title="Chọn lớp">
+                <option value="">-- Lớp --</option>
             </select>
-
-            <select id="subjectSelect" title="Chọn môn học" onchange="loadStudentsAndScores()">
-                <option value="">-- Chọn môn --</option>
+            <select id="subjectSelect" title="Chọn môn">
+                <option value="">-- Môn --</option>
             </select>
-
-            <select id="semesterSelect" title="Chọn học kỳ" onchange="loadStudentsAndScores()">
+            <select id="semesterSelect" title="Chọn học kỳ">
                 <option value="1">Học kỳ 1</option>
                 <option value="2">Học kỳ 2</option>
             </select>
+            <button onclick="loadAdminScores()">🔍 Xem điểm</button>
+            <button onclick="toggleEdit()">✏️ Sửa điểm</button>
+            <button onclick="exportAdminExcel()">⬇️ Xuất Excel</button>
         </div>
 
-        <!-- TABLE -->
-        <div class="table-wrapper">
-            <table border="1" width="100%">
-                <thead>
-                    <tr>
-                        <th>Mã HS</th>
-                        <th>Họ tên</th>
-                        <th>15 phút</th>
-                        <th>45 phút</th>
-                        <th>Thi</th>
-                        <th>TB Môn (tạm tính)</th>
-                    </tr>
-                </thead>
-                <tbody id="scoreTableBody"></tbody>
-            </table>
-        </div>
+        <table id="adminScoreTable">
+            <thead>
+                <tr>
+                    <th>Mã HS</th>
+                    <th>Họ tên</th>
+                    <th>Lớp</th>
+                    <th>Môn</th>
+                    <!-- <th>Giáo viên</th> -->
+                    <th>15 phút</th>
+                    <th>45 phút</th>
+                    <th>Thi</th>
+                    <th>TB Môn</th>
+                </tr>
+            </thead>
+            <tbody id="adminScoreBody"></tbody>
+        </table>
     </main>
-
 
     <script src="/assets/js/main.js"></script>
     <script src="/assets/js/auth.js"></script>
     <script src="/assets/js/api.js"></script>
-    <script src="/assets/js/teacher/grades.js"></script>
+    <script src="/assets/js/admin/scores.js"></script>
 </body>
 
 </html>

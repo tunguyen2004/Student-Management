@@ -5,7 +5,8 @@ module.exports = (sequelize, DataTypes) => {
       id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       student_id: { type: DataTypes.INTEGER, allowNull: false },
       subject_id: { type: DataTypes.INTEGER, allowNull: false },
-      assignment_id: { type: DataTypes.INTEGER, allowNull: false },
+      class_id: { type: DataTypes.INTEGER, allowNull: false },
+      assignment_id: { type: DataTypes.INTEGER, allowNull: true },
       score_type: {
         type: DataTypes.ENUM("15ph", "45ph", "thi", "tbmon"),
         allowNull: false,
@@ -19,7 +20,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       tableName: "scores",
+
+      // ✅ RẤT QUAN TRỌNG
       timestamps: true,
+      createdAt: "created_at",
+      updatedAt: "updated_at",
     }
   );
 
@@ -32,3 +37,38 @@ module.exports = (sequelize, DataTypes) => {
 
   return Score;
 };
+
+// // src/models/scoreModel.js
+// module.exports = (sequelize, DataTypes) => {
+//   const Score = sequelize.define(
+//     "Score",
+//     {
+//       id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+//       student_id: DataTypes.INTEGER,
+//       subject_id: DataTypes.INTEGER,
+//       class_id: DataTypes.INTEGER,
+//       assignment_id: DataTypes.INTEGER,
+//       score_type: DataTypes.STRING,
+//       score: DataTypes.FLOAT,
+//       semester: DataTypes.INTEGER,
+//       school_year: DataTypes.STRING,
+//       created_by: DataTypes.INTEGER,
+//     },
+//     {
+//       tableName: "scores",
+//       timestamps: true,
+//       underscored: true,
+//     }
+//   );
+
+//   Score.associate = (models) => {
+//     Score.belongsTo(models.Student, { foreignKey: "student_id" });
+//     Score.belongsTo(models.Subject, { foreignKey: "subject_id" });
+//     Score.belongsTo(models.Assignment, { foreignKey: "assignment_id" });
+
+//     // *** FIX QUAN TRỌNG ***
+//     Score.belongsTo(models.Class, { foreignKey: "class_id" });
+//   };
+
+//   return Score;
+// };

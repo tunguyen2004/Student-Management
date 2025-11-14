@@ -1,4 +1,11 @@
-const { User, Teacher, sequelize } = require("../models");
+const {
+  User,
+  Teacher,
+  Assignment,
+  Student,
+  Class,
+  sequelize,
+} = require("../models");
 const bcrypt = require("bcryptjs");
 const { Op } = require("sequelize"); // ✅ thêm dòng này
 
@@ -267,5 +274,53 @@ exports.deleteTeacher = async (req, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
+  }
+};
+
+exports.getStudentsForTeacher = async (req, res) => {
+  try {
+    const teacherId = req.user.teacher_id; // lấy từ token (authMiddleware)
+    const { class_id } = req.query;
+
+    if (!class_id) {
+      return res.status(400).json({ msg: "Missing class_id" });
+    }
+
+    // ✅ kiểm tra giáo viên có được phân công dạy lớp này không (theo bất kỳ môn nào)
+    const assignment = await Assignment.findOne({
+      where: { teacher_id: teacherId, class_id },
+    });
+
+    if (!assignment) {
+      return res.status(403).json({ msg: "Bạn không có quyền xem lớp này" });
+    }
+
+    // ✅ lấy danh sách học sinh trực tiếp từ bảng students
+    const students = await Student.findAll({
+      where: { class_id },
+      attributes: [
+        "id",
+        "student_code",
+        "full_name",
+        "gender",
+        "date_of_birth",
+        "status",
+      ],
+      order: [["student_code", "ASC"]],
+    });
+
+    res.json(
+      students.map((s) => ({
+        student_id: s.id,
+        student_code: s.student_code,
+        full_name: s.full_name,
+        gender: s.gender,
+        dob: s.date_of_birth, // hoặc đổi tên key thành date_of_birth cho thống nhất
+        status: s.status,
+      }))
+    );
+  } catch (error) {
+    console.error("❌ ERROR getStudentsForTeacher:", error);
+    res.status(500).json({ msg: "Server Error" });
   }
 };

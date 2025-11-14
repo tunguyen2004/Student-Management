@@ -185,8 +185,6 @@ function updateAssignment(id, assignmentData) {
   });
 }
 
-// Đổi tên hàm thành deleteAssignmentApi để tránh trùng lặp
-// với hàm deleteAssignment() sẽ được định nghĩa trong trang HTML
 function deleteAssignmentApi(id) {
   return fetchFromAPI(`assignments/${id}`, { method: "DELETE" });
 }
@@ -195,5 +193,78 @@ function createBulkAssignments(assignments) {
   return fetchFromAPI("assignments/bulk", {
     method: "POST",
     body: JSON.stringify({ assignments }),
+  });
+}
+function getFreeSlots(classId, semester, schoolYear) {
+  return fetchFromAPI(
+    `assignments/free-slots?class_id=${classId}&semester=${semester}&school_year=${schoolYear}`
+  );
+}
+
+// ✅ Validate xem lịch có bị trùng hay không
+function validateAssignment(data) {
+  return fetchFromAPI("assignments/validate", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+// =========================
+// TEACHER (SELF) API
+// =========================
+
+// }
+
+// Danh sách học sinh của lớp mà GV được phân công (check quyền ở BE)
+function getTeacherStudents(classId) {
+  return fetchFromAPI(`teachers/students?class_id=${classId}`);
+}
+
+// =========================
+// SCORES API (Giáo viên/Admin)
+// =========================
+
+// Lấy điểm theo lớp + môn + học kỳ (để prefill bảng nếu cần)
+// =========================
+// TEACHER VIEW ASSIGNMENTS API
+// =========================
+function getTeacherAssignments() {
+  return fetchFromAPI("assignments/teacher");
+}
+console.log("✅ api.js LOADED");
+
+// =========================
+// SCORES API (Giáo viên/Admin)
+// =========================
+
+// Lấy điểm theo lớp + môn + học kỳ
+function getScoresByClassSubject({
+  class_id,
+  subject_id,
+  semester,
+  school_year,
+}) {
+  const q = new URLSearchParams({
+    class_id,
+    subject_id,
+    semester,
+    school_year,
+  });
+  return fetchFromAPI(`scores?${q.toString()}`);
+}
+
+// Lưu 1 điểm (auto-save từng ô)
+function updateScore(payload) {
+  return fetchFromAPI("scores/update", {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}
+
+// Lưu nhiều điểm (nếu có UI lưu hàng loạt)
+function upsertScoresBulk(items) {
+  return fetchFromAPI("scores/bulk", {
+    method: "POST",
+    body: JSON.stringify({ items }),
   });
 }

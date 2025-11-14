@@ -196,12 +196,15 @@
             <a href="/pages/admin/students/list.html" class="menu-link active">Học sinh</a>
             <a href="/pages/admin/classes/list.html" class="menu-link">Lớp học</a>
             <a href="/pages/admin/subjects/list.html" class="menu-link">Môn học</a>
+            <a href="/pages/admin/scores/list.html" class="menu-link">Quản lý điểm</a>
             <a href="/pages/admin/teaching/assignment.html" class="menu-link">Phân công</a>
             <a href="/pages/admin/reports/class-statistics.html" class="menu-link">Báo cáo</a>
         </nav>
 
         <div class="user-section">
-            <span>Xin chào, <strong>Admin</strong></span>
+            <a href="/pages/profile/view-profile.html" style="margin-left:15px; color: #fff;text-decoration: none;">
+                <span>Xin chào, <strong>Admin</strong></span>
+            </a>
             <button class="logout-btn" onclick="logout()">Đăng xuất</button>
         </div>
     </header>
@@ -215,7 +218,7 @@
 
         <div class="filter-bar">
             <input type="search" id="searchInput" placeholder="Tìm kiếm theo tên hoặc mã HS...">
-            <select id="classFilterSelect">
+            <select id="classFilterSelect" title="Lọc theo lớp">
                 <!-- Options will be loaded here -->
             </select>
         </div>

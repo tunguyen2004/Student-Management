@@ -132,27 +132,67 @@
         <nav class="menu">
             <a href="/pages/teacher/dashboard.html" class="menu-link ">Tổng quan</a>
             <a href="/pages/teacher/teaching-list.html" class="menu-link active">Phân công giảng dạy</a>
-            <!-- <a href="/pages/teacher/class-students.html" class="menu-link">Danh sách học sinh</a> -->
+            <a href="/pages/teacher/class-students.html" class="menu-link">Danh sách học sinh</a>
             <a href="/pages/teacher/grades/list.html" class="menu-link">Quản lý điểm</a>
             <a href="/pages/teacher/subject-statistics.html" class="menu-link">Thống kê môn học</a>
         </nav>
 
         <div class="user-section">
-            <span>Xin chào, <strong>GV. Nguyễn Văn A</strong></span>
+            <a href="/pages/profile/view-profile.html" style="margin-left:15px; color: #fff;text-decoration: none;">
+                <span>Xin chào, <strong>Admin</strong></span>
+            </a>
             <button class="logout-btn" onclick="logout()">Đăng xuất</button>
         </div>
     </header>
 
 
     <!-- MAIN -->
+    <!-- MAIN -->
     <main>
+        <div class="container">
 
+            <!-- Bộ lọc -->
+            <div class="filter-bar">
+                <label>Năm học:</label>
+                <select id="filterSchoolYear" title="Chọn năm học"></select>
 
+                <label>Học kỳ:</label>
+                <select id="filterSemester" title="Chọn học kỳ">
+                    <option value="">-- Tất cả --</option>
+                    <option value="1">Học kỳ 1</option>
+                    <option value="2">Học kỳ 2</option>
+                </select>
+            </div>
+
+            <!-- Bảng danh sách phân công -->
+            <table class="teaching-table">
+                <thead>
+                    <tr>
+                        <th>Lớp</th>
+                        <th>Môn giảng dạy</th>
+                        <th>Học kỳ</th>
+                        <th>Năm học</th>
+                        <th>Lịch dạy</th>
+                    </tr>
+                </thead>
+                <tbody id="teachingTableBody">
+                    <!-- Data render từ JS -->
+                </tbody>
+            </table>
+
+            <!-- Tổng kết -->
+            <div class="summary">
+                📚 Tổng số môn được phân công: <span id="assignmentCount">0</span>
+            </div>
+
+        </div>
     </main>
+
 
 
     <script src="/assets/js/main.js"></script>
     <script src="/assets/js/auth.js"></script>
+    <script src="/assets/js/teacher/teaching-list.js"></script>
 
 
 </body>

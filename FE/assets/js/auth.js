@@ -5,10 +5,7 @@ const user = JSON.parse(localStorage.getItem("loggedUser"));
 
 // Kiểm tra thời điểm hết hạn của token (trả về timestamp ms) hoặc null nếu không xác định
 function getTokenExpiry(userObj) {
-  if (!userObj) return null;
-
-  // Thử đọc JWT từ các trường phổ biến
-  const token = userObj.token || userObj.accessToken || userObj.jwt;
+  const token = userObj?.token || localStorage.getItem("token");
   if (token && typeof token === "string") {
     const parts = token.split(".");
     if (parts.length === 3) {
@@ -16,55 +13,71 @@ function getTokenExpiry(userObj) {
         const payload = JSON.parse(
           atob(parts[1].replace(/-/g, "+").replace(/_/g, "/"))
         );
-        if (payload && payload.exp) return payload.exp * 1000; // exp là giây -> ms
+        if (payload && payload.exp) {
+          console.log("Token exp (giây):", payload.exp);
+          return payload.exp * 1000; // exp là giây -> ms
+        } else {
+          console.error("Token không chứa trường exp.");
+        }
       } catch (e) {
-        // bỏ qua nếu decode thất bại
+        console.error("Lỗi khi decode JWT:", e);
       }
+    } else {
+      console.error("Token không hợp lệ:", token);
     }
+  } else {
+    console.error("Không tìm thấy token.");
   }
-
-  // Thử đọc các trường expires trong user object (số hoặc chuỗi)
-  const candidates = ["expiresAt", "expiry", "expiryTime", "expiration", "exp"];
-  for (const key of candidates) {
-    if (userObj[key]) {
-      const val = userObj[key];
-      if (typeof val === "number") {
-        // Nếu là giây (khoảng < 1e12) chuyển sang ms
-        return val > 1e12 ? val : val * 1000;
-      }
-      const parsed = Date.parse(val);
-      if (!isNaN(parsed)) return parsed;
-    }
-  }
-
   return null;
 }
 
 function performLogout(message) {
+  console.log("Đăng xuất người dùng...");
   try {
     localStorage.removeItem("loggedUser");
-  } catch (e) {}
-  if (message) alert(message);
+  } catch (e) {
+    console.error("Lỗi khi xóa thông tin đăng nhập:", e);
+  }
+  if (message) {
+    alert(message);
+  } else {
+    alert("Bạn đã đăng xuất thành công.");
+  }
   window.location.href = "/index.html";
 }
 
-// Thiết lập kiểm tra và tự động đăng xuất khi token hết hạn
-(function scheduleTokenExpiryCheck() {
-  const expiryTs = getTokenExpiry(user);
-  if (!expiryTs) return; // không có thông tin expiry -> không làm gì
+let logoutTimer = null;
 
-  const now = Date.now();
-  if (now >= expiryTs) {
+function scheduleTokenExpiryCheck() {
+  const user = JSON.parse(localStorage.getItem("loggedUser")); // Lấy lại user từ localStorage
+  const expiryTs = getTokenExpiry(user);
+  if (expiryTs && Date.now() >= expiryTs) {
     performLogout("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
     return;
   }
 
-  const timeout = expiryTs - now + 1000; // thêm 1s đệm
-  // Hủy timeout khi user bị logout theo cách khác không xử lý ở đây (không cần thiết trong file nhỏ)
-  setTimeout(() => {
-    performLogout("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
-  }, timeout);
-})();
+  // Xóa timer cũ nếu có
+  if (logoutTimer) {
+    clearInterval(logoutTimer);
+    logoutTimer = null;
+  }
+
+  logoutTimer = setInterval(() => {
+    const user = JSON.parse(localStorage.getItem("loggedUser")); // Lấy lại user từ localStorage
+    const expiryTs = getTokenExpiry(user);
+    if (!expiryTs) return; // Không có thông tin hết hạn -> không làm gì
+
+    const now = Date.now();
+    if (now >= expiryTs) {
+      // Token đã hết hạn -> đăng xuất ngay lập tức
+      clearInterval(logoutTimer); // Dừng kiểm tra
+      performLogout("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+    }
+  }, 60 * 1000); // Kiểm tra mỗi phút
+}
+
+// Gọi hàm kiểm tra ngay khi tải trang
+scheduleTokenExpiryCheck();
 
 // Nếu chưa đăng nhập -> quay lại trang login
 if (!user) {
@@ -84,8 +97,16 @@ if (currentPath.includes("/admin/") && user.role !== "admin") {
 
 // Nếu là trang teacher mà user không phải teacher -> chặn
 if (currentPath.includes("/teacher/") && user.role !== "teacher") {
-  alert("Bạn không có quyền truy cập trang giáo viên!");
+  alert("Bạn không có quyền truy cập trang !");
   window.location.href = "/pages/admin/dashboard.html";
 }
 
 // =========================
+console.log("Token expiry timestamp:", getTokenExpiry(user));
+console.log(localStorage.getItem("token"));
+console.log("Token:", localStorage.getItem("token"));
+
+const now = Date.now();
+const expiryTs = getTokenExpiry(user);
+console.log("Thời gian hiện tại:", new Date(now).toLocaleString());
+console.log("Thời gian hết hạn token:", new Date(expiryTs).toLocaleString());

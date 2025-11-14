@@ -178,12 +178,16 @@
             <a href="/pages/admin/students/list.html" class="menu-link"> Học sinh</a>
             <a href="/pages/admin/classes/list.html" class="menu-link active"> Lớp học</a>
             <a href="/pages/admin/subjects/list.html" class="menu-link"> Môn học</a>
+            <a href="/pages/admin/scores/list.html" class="menu-link">Quản lý điểm</a>
             <a href="/pages/admin/teaching/assignment.html" class="menu-link">Phân công</a>
             <a href="/pages/admin/reports/class-statistics.html" class="menu-link">Báo cáo</a>
         </nav>
 
         <div class="user-section">
-            <span>Xin chào, <strong>Admin</strong></span>
+            <!-- <span>Xin chào, <strong>Admin</strong></span> -->
+            <a href="/pages/profile/view-profile.html" style="margin-left:15px;">
+                <span>Xin chào, <strong>Admin</strong></span>
+            </a>
             <button class="logout-btn" onclick="logout()">Đăng xuất</button>
         </div>
     </header>
@@ -228,8 +232,8 @@
         includeHTML('modal-container', '/components/class-modal.html', () => {
             // Đổi id modal để tránh xung đột với student-modal
             const modal = document.getElementById('classModal');
-            if(modal) modal.id = 'classModal'; // Đảm bảo id là duy nhất nếu cần
-            
+            if (modal) modal.id = 'classModal'; // Đảm bảo id là duy nhất nếu cần
+
             initializeClassManagement();
         });
     </script>

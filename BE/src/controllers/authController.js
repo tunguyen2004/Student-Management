@@ -191,6 +191,7 @@ exports.register = async (req, res) => {
         id: user.id,
         username: user.username,
         role: user.role,
+        teacher_id: user.Teacher ? user.Teacher.id : null, // ✅ Thêm dòng này
       },
     };
 
@@ -292,6 +293,7 @@ exports.login = async (req, res) => {
         id: user.id,
         username: user.username,
         role: user.role,
+        teacher_id: user.Teacher ? user.Teacher.id : null, // ✅ ADD THIS
       },
     };
 

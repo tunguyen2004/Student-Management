@@ -74,6 +74,18 @@ exports.getAssignmentById = async (req, res) => {
 exports.createAssignment = async (req, res) => {
   const { teacher_id, class_id, subject_id, semester, school_year } = req.body;
 
+  // ✅ Convert teaching_schedule nếu FE gửi JSON string
+  if (req.body.teaching_schedule) {
+    try {
+      if (typeof req.body.teaching_schedule === "string") {
+        req.body.teaching_schedule = JSON.parse(req.body.teaching_schedule);
+      }
+      req.body.teaching_schedule = JSON.stringify(req.body.teaching_schedule);
+    } catch (e) {
+      return res.status(400).json({ msg: "Invalid teaching_schedule format" });
+    }
+  }
+
   if (!teacher_id || !class_id || !subject_id || !semester || !school_year) {
     return res
       .status(400)
@@ -81,29 +93,17 @@ exports.createAssignment = async (req, res) => {
   }
 
   try {
-    // Check if teacher, class, and subject exist
+    // Check if teacher, class and subject exist
     const teacher = await Teacher.findByPk(teacher_id);
-    if (!teacher) {
-      return res.status(404).json({ msg: "Teacher not found" });
-    }
-
     const classInstance = await Class.findByPk(class_id);
-    if (!classInstance) {
-      return res.status(404).json({ msg: "Class not found" });
-    }
-
     const subject = await Subject.findByPk(subject_id);
-    if (!subject) {
-      return res.status(404).json({ msg: "Subject not found" });
-    }
 
-    const newAssignment = await Assignment.create({
-      teacher_id,
-      class_id,
-      subject_id,
-      semester,
-      school_year,
-    });
+    if (!teacher) return res.status(404).json({ msg: "Teacher not found" });
+    if (!classInstance) return res.status(404).json({ msg: "Class not found" });
+    if (!subject) return res.status(404).json({ msg: "Subject not found" });
+
+    // ✅ Create assignment with req.body (đã xử lý schedule)
+    const newAssignment = await Assignment.create(req.body);
 
     const assignmentWithDetails = await Assignment.findByPk(newAssignment.id, {
       include: [
@@ -133,56 +133,48 @@ exports.createAssignment = async (req, res) => {
 // @access  Admin
 exports.updateAssignment = async (req, res) => {
   const { id } = req.params;
-  const { teacher_id, class_id, subject_id, semester, school_year } = req.body;
+
+  // ✅ Convert teaching_schedule nếu FE gửi JSON string
+  if (req.body.teaching_schedule) {
+    try {
+      if (typeof req.body.teaching_schedule === "string") {
+        req.body.teaching_schedule = JSON.parse(req.body.teaching_schedule);
+      }
+      req.body.teaching_schedule = JSON.stringify(req.body.teaching_schedule);
+    } catch (e) {
+      return res.status(400).json({ msg: "Invalid teaching_schedule format" });
+    }
+  }
 
   try {
-    let assignment = await Assignment.findByPk(id);
+    // ✅ Trước tiên phải tìm assignment
+    const assignment = await Assignment.findByPk(id);
     if (!assignment) {
       return res.status(404).json({ msg: "Assignment not found" });
     }
 
-    // If core fields are being updated, check for existence
-    if (teacher_id) {
-      const teacher = await Teacher.findByPk(teacher_id);
-      if (!teacher) {
-        return res.status(404).json({ msg: "Teacher not found" });
-      }
+    const { teacher_id, class_id, subject_id, semester, school_year } =
+      req.body;
+
+    if (!teacher_id || !class_id || !subject_id || !semester || !school_year) {
+      return res.status(400).json({
+        msg: "Please provide all required fields for assignment",
+      });
     }
 
-    if (class_id) {
-      const classInstance = await Class.findByPk(class_id);
-      if (!classInstance) {
-        return res.status(404).json({ msg: "Class not found" });
-      }
-    }
+    // ✅ Kiểm tra tồn tại của teacher/class/subject
+    const teacher = await Teacher.findByPk(teacher_id);
+    const classInstance = await Class.findByPk(class_id);
+    const subject = await Subject.findByPk(subject_id);
 
-    if (subject_id) {
-      const subject = await Subject.findByPk(subject_id);
-      if (!subject) {
-        return res.status(404).json({ msg: "Subject not found" });
-      }
-    }
+    if (!teacher) return res.status(404).json({ msg: "Teacher not found" });
+    if (!classInstance) return res.status(404).json({ msg: "Class not found" });
+    if (!subject) return res.status(404).json({ msg: "Subject not found" });
 
-    // Check for unique constraint violation before updating
-    const existingAssignment = await Assignment.findOne({
-      where: {
-        teacher_id: teacher_id || assignment.teacher_id,
-        class_id: class_id || assignment.class_id,
-        subject_id: subject_id || assignment.subject_id,
-        semester: semester || assignment.semester,
-        school_year: school_year || assignment.school_year,
-        id: { [Op.ne]: id },
-      },
-    });
-
-    if (existingAssignment) {
-      return res
-        .status(400)
-        .json({ msg: "This teaching assignment already exists." });
-    }
-
+    // ✅ Update
     await assignment.update(req.body);
 
+    // ✅ Lấy lại bản ghi sau update
     const updatedAssignment = await Assignment.findByPk(id, {
       include: [
         {
@@ -201,7 +193,8 @@ exports.updateAssignment = async (req, res) => {
         .status(400)
         .json({ msg: "This teaching assignment already exists." });
     }
-    console.error(err.message);
+
+    console.error(err);
     res.status(500).send("Server Error");
   }
 };
@@ -293,11 +286,9 @@ exports.bulkAssignTeachers = async (req, res) => {
 
       if (existingAssignment) {
         await t.rollback();
-        return res
-          .status(400)
-          .json({
-            msg: `Assignment for teacher ${teacher_id}, class ${class_id}, and subject ${subject_id} already exists.`,
-          });
+        return res.status(400).json({
+          msg: `Assignment for teacher ${teacher_id}, class ${class_id}, and subject ${subject_id} already exists.`,
+        });
       }
 
       const newAssignment = await Assignment.create(assignmentData, {
@@ -328,5 +319,166 @@ exports.bulkAssignTeachers = async (req, res) => {
     await t.rollback();
     console.error(err.message);
     res.status(500).send("Server Error");
+  }
+};
+
+// @desc    Get free/occupied teaching slots for a class (avoid time conflicts)
+// @route   GET /api/assignments/free-slots
+// @access  Admin + Teacher
+exports.getFreeSlots = async (req, res) => {
+  const { class_id, semester, school_year } = req.query;
+
+  if (!class_id || !semester || !school_year) {
+    return res.status(400).json({
+      msg: "Missing required params: class_id, semester, school_year",
+    });
+  }
+
+  try {
+    const assignments = await Assignment.findAll({
+      where: { class_id, semester, school_year },
+      attributes: ["teaching_schedule"],
+    });
+
+    const occupied = {};
+
+    assignments.forEach((a) => {
+      if (!a.teaching_schedule) return;
+
+      const schedule =
+        typeof a.teaching_schedule === "string"
+          ? JSON.parse(a.teaching_schedule)
+          : a.teaching_schedule;
+
+      Object.entries(schedule).forEach(([day, periods]) => {
+        if (!occupied[day]) occupied[day] = [];
+        occupied[day].push(...periods);
+      });
+    });
+
+    // tính lịch free ( nếu lớp học có 12 tiết mỗi ngày )
+    const allPeriods = [
+      "T1",
+      "T2",
+      "T3",
+      "T4",
+      "T5",
+      "T6",
+      "T7",
+      "T8",
+      "T9",
+      "T10",
+      "T11",
+      "T12",
+    ];
+    const free = {};
+
+    for (let day of ["thu2", "thu3", "thu4", "thu5", "thu6", "thu7"]) {
+      free[day] = occupied[day]
+        ? allPeriods.filter((p) => !occupied[day].includes(p))
+        : [...allPeriods];
+    }
+
+    res.json({ occupied, free });
+  } catch (error) {
+    console.error("❌ ERROR getFreeSlots:", error);
+    res.status(500).json({ msg: "Server Error" });
+  }
+};
+// @desc    Validate schedule (check teacher conflicts + class conflicts)
+// @route   POST /api/assignments/validate
+// @access  Admin + Teacher
+exports.validateAssignment = async (req, res) => {
+  const { teacher_id, class_id, semester, school_year, teaching_schedule } =
+    req.body;
+
+  if (
+    !teacher_id ||
+    !class_id ||
+    !semester ||
+    !school_year ||
+    !teaching_schedule
+  ) {
+    return res.status(400).json({ msg: "Missing required fields." });
+  }
+
+  const schedule =
+    typeof teaching_schedule === "string"
+      ? JSON.parse(teaching_schedule)
+      : teaching_schedule;
+
+  try {
+    const assignments = await Assignment.findAll({
+      where: {
+        semester,
+        school_year,
+        [Op.or]: [{ class_id }, { teacher_id }],
+      },
+      include: [{ model: Subject }],
+    });
+
+    for (const a of assignments) {
+      if (!a.teaching_schedule) continue;
+      const aSchedule =
+        typeof a.teaching_schedule === "string"
+          ? JSON.parse(a.teaching_schedule)
+          : a.teaching_schedule;
+
+      for (const day in schedule) {
+        if (!aSchedule[day]) continue;
+
+        const conflict = schedule[day].filter((p) =>
+          aSchedule[day].includes(p)
+        );
+
+        if (conflict.length > 0) {
+          const reason =
+            a.class_id === class_id
+              ? `❌ Lớp đã có môn khác vào ${day} tiết ${conflict.join(", ")}`
+              : `❌ Giáo viên đã dạy lớp khác vào ${day} tiết ${conflict.join(
+                  ", "
+                )}`;
+
+          return res.json({ valid: false, reason });
+        }
+      }
+    }
+
+    res.json({ valid: true });
+  } catch (error) {
+    console.error("❌ ERROR validateAssignment:", error);
+    res.status(500).json({ msg: "Server Error" });
+  }
+};
+
+// @desc  Get assignments for logged-in teacher
+// @route GET /api/assignments/teacher
+// @access Teacher
+exports.getAssignmentsForTeacher = async (req, res) => {
+  try {
+    const teacherId = req.user.teacher_id; // lấy từ token middleware
+
+    const assignments = await Assignment.findAll({
+      where: { teacher_id: teacherId },
+      include: [
+        {
+          model: Class,
+          attributes: ["class_code", "class_name", "school_year"],
+        },
+        {
+          model: Subject,
+          attributes: ["subject_code", "subject_name"],
+        },
+      ],
+      order: [
+        ["school_year", "DESC"],
+        ["semester", "ASC"],
+      ],
+    });
+
+    res.json(assignments);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Server Error" });
   }
 };

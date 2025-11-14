@@ -1,2 +1,222 @@
-<!-- Danh sách học sinh lớp mình -->
-<section>Danh sách học sinh lớp mình</section>
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng điều khiển | Giáo viên</title>
+    <link rel="stylesheet" href="/assets/css/main.css">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+
+
+        main {
+            padding: 100px 30px 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+        }
+
+        .card h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            font-size: 28px;
+            color: #2563eb;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        /* --- LÀM ĐẸP GIAO DIỆN DANH SÁCH HỌC SINH --- */
+
+        main {
+            padding: 100px 30px 30px;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        /* FILTER BAR */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: #ffffff;
+            padding: 16px 22px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 12px rgba(148, 163, 184, 0.2);
+        }
+
+        .filter-bar label {
+            font-size: 16px;
+            color: #334155;
+            font-weight: 600;
+        }
+
+        .filter-bar select {
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            font-size: 15px;
+            color: #1e293b;
+            outline: none;
+            transition: all 0.25s ease;
+        }
+
+        .filter-bar select:hover {
+            border-color: #2563eb;
+        }
+
+        .filter-bar select:focus {
+            border: 2px solid #2563eb;
+            box-shadow: 0 0 6px rgba(37, 99, 235, 0.25);
+        }
+
+        /* TABLE */
+        .teaching-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        /* HEADER */
+        .teaching-table thead th {
+            background: linear-gradient(90deg, #2563eb, #3b82f6);
+            color: #fff;
+            padding: 15px;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* ROWS */
+        .teaching-table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .teaching-table tbody tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .teaching-table tbody tr:hover {
+            background: #e8eef7;
+        }
+
+        .teaching-table td {
+            padding: 12px;
+            text-align: center;
+            font-size: 15px;
+            color: #334155;
+        }
+
+        /* Empty trạng thái */
+        #studentTableBody td {
+            padding: 18px;
+            color: #64748b;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- HEADER -->
+    <header class="topbar">
+        <div class="logo">
+            <img src="/assets/img/icons/logowebhs.png" alt="logo"
+                style="height:40px;width:auto;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.08);margin-right:10px;">
+            <span style="font-size:20px;font-weight:700;letter-spacing:1px;color:#fff;">MinhThu</span>
+        </div>
+        <nav class="menu">
+            <a href="/pages/teacher/dashboard.html" class="menu-link ">Tổng quan</a>
+            <a href="/pages/teacher/teaching-list.html" class="menu-link">Phân công giảng dạy</a>
+            <a href="/pages/teacher/class-students.html" class="menu-link active">Danh sách học sinh</a>
+            <a href="/pages/teacher/grades/list.html" class="menu-link ">Quản lý điểm</a>
+            <a href="/pages/teacher/subject-statistics.html" class="menu-link">Thống kê môn học</a>
+        </nav>
+
+        <div class="user-section">
+            <a href="/pages/profile/view-profile.html" style="margin-left:15px; color: #fff;text-decoration: none;">
+                <span>Xin chào, <strong>Admin</strong></span>
+            </a>
+            <button class="logout-btn" onclick="logout()">Đăng xuất</button>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <main>
+
+        <h2 style="margin-bottom: 20px;">Danh sách học sinh lớp phụ trách</h2>
+
+        <!-- Filter -->
+        <div class="filter-bar">
+            <label>Chọn lớp:</label>
+            <select id="classSelect" title="Chọn lớp" onchange="loadStudents()">
+                <option value="">-- Chọn lớp --</option>
+            </select>
+        </div>
+
+        <!-- Table -->
+        <table class="teaching-table" id="studentTable">
+            <thead>
+                <tr>
+                    <th>Mã HS</th>
+                    <th>Họ và tên</th>
+                    <th>Giới tính</th>
+                    <th>Ngày sinh</th>
+                </tr>
+            </thead>
+            <tbody id="studentTableBody">
+                <tr>
+                    <td colspan="4">Vui lòng chọn lớp.</td>
+                </tr>
+            </tbody>
+        </table>
+
+    </main>
+
+
+
+    <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script src="/assets/js/teacher/class-students.js"></script>
+</body>
+
+</html>

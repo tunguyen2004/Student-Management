@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thêm điểm</title>
+    <title>Quản lý điểm</title>
     <link rel="stylesheet" href="/assets/css/main.css">
     <style>
         body {
@@ -21,8 +21,6 @@
             border-radius: 12px;
             box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
             padding: 24px;
-            margin-top: 5%;
-
         }
 
         h2 {
@@ -57,6 +55,21 @@
             background: white;
         }
 
+        .filter-bar button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 18px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .filter-bar button:hover {
+            background: #2563eb;
+        }
+
         /* Bảng điểm */
         table {
             width: 100%;
@@ -83,50 +96,74 @@
             background: #f1f5f9;
         }
 
-        input.score-input {
-            width: 60px;
+        /* Ghi chú */
+        .note {
+            font-size: 14px;
+            margin-top: 12px;
+            color: #475569;
+        }
+
+        main {
+            margin-top: 5%;
+        }
+
+        .page-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #2563eb;
+            margin-bottom: 20px;
+        }
+
+        .filter-panel {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 16px;
+        }
+
+        .filter-panel select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        #scoreTable {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #scoreTable th {
+            background: #2563eb;
+            color: white;
+            padding: 10px;
+        }
+
+        #scoreTable td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .score-input {
+            width: 75px;
             padding: 6px;
+            border-radius: 6px;
             text-align: center;
             border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 14px;
         }
 
-        .actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 16px;
+        .score-input.success {
+            background: #dcfce7;
         }
 
-        .save-btn {
-            background: #16a34a;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 10px 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .save-btn:hover {
-            background: #15803d;
-        }
-
-        .back-btn {
-            background: #64748b;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 10px 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .back-btn:hover {
-            background: #475569;
+        .score-input.error {
+            background: #fee2e2;
         }
     </style>
 </head>
@@ -143,134 +180,66 @@
         <nav class="menu">
             <a href="/pages/teacher/dashboard.html" class="menu-link">Tổng quan</a>
             <a href="/pages/teacher/teaching-list.html" class="menu-link">Phân công giảng dạy</a>
+            <a href="/pages/teacher/class-students.html" class="menu-link">Danh sách học sinh</a>
             <a href="/pages/teacher/grades/list.html" class="menu-link active">Quản lý điểm</a>
             <a href="/pages/teacher/subject-statistics.html" class="menu-link">Thống kê môn học</a>
         </nav>
 
         <div class="user-section">
-            <span>Xin chào, <strong>GV. Nguyễn Văn A</strong></span>
+            <a href="/pages/profile/view-profile.html" style="margin-left:15px; color: #fff;text-decoration: none;">
+                <span>Xin chào, <strong>Admin</strong></span>
+            </a>
             <button class="logout-btn" onclick="logout()">Đăng xuất</button>
         </div>
     </header>
 
     <!-- MAIN -->
     <main>
-        <h2>➕ Thêm điểm môn học</h2>
+        <h2 class="page-title">📘 Nhập điểm học sinh</h2>
 
-        <!-- Bộ lọc -->
-        <div class="filter-bar">
-            <div>
-                <label for="year">Năm học:</label>
-                <select id="year">
-                    <option>2025–2026</option>
-                    <option>2024–2025</option>
-                </select>
-            </div>
-            <div>
-                <label for="semester">Kỳ:</label>
-                <select id="semester">
-                    <option>1</option>
-                    <option>2</option>
-                </select>
-            </div>
-            <div>
-                <label for="subject">Môn học:</label>
-                <select id="subject">
-                    <option>Toán</option>
-                    <option>Ngữ văn</option>
-                    <option>Vật lý</option>
-                </select>
-            </div>
-            <div>
-                <label for="class">Lớp:</label>
-                <select id="class">
-                    <option>10A1</option>
-                    <option>10A2</option>
-                    <option>10A3</option>
-                </select>
-            </div>
-            <div>
-                <button class="save-btn" onclick="loadStudents()">Tải danh sách 🔍</button>
-            </div>
+        <!-- FILTER -->
+        <div class="filter-panel">
+            <select id="classSelect" title="Chọn lớp" onchange="loadStudentsAndScores()">
+                <option value="">-- Chọn lớp --</option>
+            </select>
+
+            <select id="subjectSelect" title="Chọn môn học" onchange="loadStudentsAndScores()">
+                <option value="">-- Chọn môn --</option>
+            </select>
+
+            <select id="semesterSelect" title="Chọn học kỳ" onchange="loadStudentsAndScores()">
+                <option value="1">Học kỳ 1</option>
+                <option value="2">Học kỳ 2</option>
+            </select>
         </div>
 
-        <!-- Bảng nhập điểm -->
-        <table id="score-table">
-            <thead>
-                <tr>
-                    <th>STT</th>
-                    <th>Họ và tên</th>
-                    <th>Miệng</th>
-                    <th>15 phút</th>
-                    <th>1 tiết</th>
-                    <th>Thi</th>
-                    <th>Trung bình</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- sẽ được tạo tự động -->
-            </tbody>
-        </table>
-
-        <!-- Nút hành động -->
-        <div class="actions">
-            <button class="back-btn" onclick="window.location.href='/pages/teacher/grades/list.html'">↩️ Quay
-                lại</button>
-            <button class="save-btn" onclick="saveScores()">💾 Lưu điểm mới</button>
+        <!-- TABLE -->
+        <div class="table-wrapper">
+            <table id="scoreTable">
+                <thead>
+                    <tr>
+                        <th>Mã HS</th>
+                        <th>Họ và tên</th>
+                        <th>Điểm 15'</th>
+                        <th>Điểm 45'</th>
+                        <th>Thi</th>
+                        <th>TB Môn</th>
+                    </tr>
+                </thead>
+                <tbody id="scoreTableBody">
+                    <tr>
+                        <td colspan="6" style="text-align:center;">Vui lòng chọn lớp và môn.</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </main>
 
 
-
     <script src="/assets/js/main.js"></script>
     <script src="/assets/js/auth.js"></script>
-    <script>
-        const students = [
-            { id: 1, name: "Nguyễn Văn An" },
-            { id: 2, name: "Trần Thị Bình" },
-            { id: 3, name: "Lê Hoàng Cường" },
-        ];
-
-        // Tải danh sách học sinh
-        function loadStudents() {
-            const tbody = document.querySelector("#score-table tbody");
-            tbody.innerHTML = "";
-            students.forEach((s, index) => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-          <td>${index + 1}</td>
-          <td>${s.name}</td>
-          <td><input type="number" min="0" max="10" class="score-input" oninput="updateAverage(this)"></td>
-          <td><input type="number" min="0" max="10" class="score-input" oninput="updateAverage(this)"></td>
-          <td><input type="number" min="0" max="10" class="score-input" oninput="updateAverage(this)"></td>
-          <td><input type="number" min="0" max="10" class="score-input" oninput="updateAverage(this)"></td>
-          <td class="avg-cell">-</td>
-        `;
-                tbody.appendChild(row);
-            });
-        }
-
-        // Cập nhật điểm trung bình khi nhập
-        function updateAverage(input) {
-            const row = input.closest("tr");
-            const scores = [...row.querySelectorAll(".score-input")].map(i => parseFloat(i.value) || 0);
-            const avg = (scores[0] + scores[1] + scores[2] * 2 + scores[3] * 3) / 7;
-            row.querySelector(".avg-cell").textContent = avg ? avg.toFixed(1) : "-";
-        }
-
-        // Lưu điểm
-        function saveScores() {
-            const rows = document.querySelectorAll("#score-table tbody tr");
-            const result = [];
-            rows.forEach(r => {
-                const name = r.children[1].textContent;
-                const scores = [...r.querySelectorAll(".score-input")].map(i => i.value);
-                result.push({ name, scores });
-            });
-            alert("Đã lưu điểm mới cho " + result.length + " học sinh 🎉");
-            console.log(result);
-        }
-    </script>
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/teacher/grades.js"></script>
 </body>
 
 </html>

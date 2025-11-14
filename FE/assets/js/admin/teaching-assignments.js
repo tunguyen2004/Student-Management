@@ -138,6 +138,12 @@ function createModal() {
   document
     .getElementById("assignmentForm")
     .addEventListener("submit", handleAssignmentFormSubmit);
+  // ✅ Tự động gọi API free-slots khi user thay đổi các trường này
+  document.getElementById("classId").addEventListener("change", loadFreeSlots);
+  document.getElementById("semester").addEventListener("change", loadFreeSlots);
+  document
+    .getElementById("schoolYear")
+    .addEventListener("input", loadFreeSlots);
 }
 
 async function populateTeachers() {
@@ -204,7 +210,7 @@ async function openAssignmentModal(id = null) {
     modalTitle.textContent = "Cập nhật phân công";
     try {
       const assignment = await getAssignmentById(id);
-      document.getElementById("assignmentId").value = assignment.id;
+      document.getElementById("assignmentId").value = assignment.assignment_id;
       document.getElementById("teacherId").value = assignment.teacher_id;
       document.getElementById("classId").value = assignment.class_id;
       document.getElementById("subjectId").value = assignment.subject_id;
@@ -239,28 +245,75 @@ function addScheduleRow(day = "thu2", periods = []) {
 
   const dayOptions = ["thu2", "thu3", "thu4", "thu5", "thu6", "thu7"]
     .map(
-      (d) =>
-        `<option value="${d}" ${d === day ? "selected" : ""}>${
-          d.charAt(0).toUpperCase() + d.slice(1)
-        }</option>`
+      (d) => `<option value="${d}" ${d === day ? "selected" : ""}>
+        ${d.charAt(0).toUpperCase() + d.slice(1)}
+      </option>`
     )
     .join("");
 
   const periodOptions = Array.from({ length: 12 }, (_, i) => `T${i + 1}`)
     .map(
-      (p) =>
-        `<option value="${p}" ${
-          periods.includes(p) ? "selected" : ""
-        }>${p}</option>`
+      (p) => `<option value="${p}" ${periods.includes(p) ? "selected" : ""}>
+        ${p}
+      </option>`
     )
     .join("");
 
   row.innerHTML = `
-        <select class="schedule-day form-control">${dayOptions}</select>
-        <select class="schedule-periods form-control" multiple>${periodOptions}</select>
-        <button type="button" class="btn-remove-schedule" onclick="this.parentElement.remove()">Xóa</button>
-    `;
+      <select class="schedule-day form-control">${dayOptions}</select>
+      <select class="schedule-periods form-control" multiple>${periodOptions}</select>
+      <button type="button" class="btn-remove-schedule" onclick="this.parentElement.remove()">Xóa</button>
+  `;
+
   container.appendChild(row);
+
+  // 🔥 Auto update disabled periods when day changes
+  row.querySelector(".schedule-day").addEventListener("change", () => {
+    updateDisabledPeriods(window._occupiedSlots || {});
+  });
+
+  // 🔥 Apply disabling ngay lập tức nếu đã load free slots rồi
+  updateDisabledPeriods(window._occupiedSlots || {});
+}
+
+async function loadFreeSlots() {
+  const classId = document.getElementById("classId").value;
+  const semester = document.getElementById("semester").value;
+  const schoolYear = document.getElementById("schoolYear").value;
+
+  if (!classId || !semester || !schoolYear) return;
+
+  try {
+    const data = await getFreeSlots(classId, semester, schoolYear);
+
+    console.log("⚡ FREE SLOTS:", data);
+
+    // 🟢 Lưu occupied vào global để schedule-row mới cũng disable được
+    window._occupiedSlots = data.occupied || {};
+
+    updateDisabledPeriods(window._occupiedSlots);
+  } catch (err) {
+    console.error("❌ Error loading free slots:", err);
+  }
+}
+
+function updateDisabledPeriods(occupied) {
+  const rows = document.querySelectorAll("#scheduleContainer .schedule-row");
+
+  rows.forEach((row) => {
+    const day = row.querySelector(".schedule-day").value;
+    const periodsSelect = row.querySelector(".schedule-periods");
+
+    Array.from(periodsSelect.options).forEach((opt) => {
+      if (occupied[day] && occupied[day].includes(opt.value)) {
+        opt.disabled = true;
+        opt.style.color = "#999";
+      } else {
+        opt.disabled = false;
+        opt.style.color = "#000";
+      }
+    });
+  });
 }
 
 async function handleAssignmentFormSubmit(event) {
@@ -296,7 +349,7 @@ async function handleAssignmentFormSubmit(event) {
   };
 
   try {
-    if (assignmentId) {
+    if (assignmentId && assignmentId !== "") {
       await updateAssignment(assignmentId, data);
       alert("Cập nhật phân công thành công!");
     } else {

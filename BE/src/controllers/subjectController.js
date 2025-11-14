@@ -1,4 +1,4 @@
-const { Subject } = require('../models');
+const { Subject } = require("../models");
 
 // @desc    Get all subjects
 // @route   GET /api/subjects
@@ -6,12 +6,12 @@ const { Subject } = require('../models');
 exports.getAllSubjects = async (req, res) => {
   try {
     const subjects = await Subject.findAll({
-      order: [['subject_name', 'ASC']],
+      order: [["subject_name", "ASC"]],
     });
     res.json(subjects);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).send("Server Error");
   }
 };
 
@@ -23,13 +23,13 @@ exports.getSubjectById = async (req, res) => {
     const subject = await Subject.findByPk(req.params.id);
 
     if (!subject) {
-      return res.status(404).json({ msg: 'Subject not found' });
+      return res.status(404).json({ msg: "Subject not found" });
     }
 
     res.json(subject);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).send("Server Error");
   }
 };
 
@@ -37,18 +37,28 @@ exports.getSubjectById = async (req, res) => {
 // @route   POST /api/subjects
 // @access  Admin
 exports.createSubject = async (req, res) => {
-  const { subject_name, subject_code, description, credits, hours_per_week, is_elective, status } = req.body;
+  const {
+    subject_name,
+    subject_code,
+    description,
+    credits,
+    hours_per_week,
+    is_elective,
+    status,
+  } = req.body;
 
   // Basic validation
   if (!subject_name || !subject_code || !credits) {
-    return res.status(400).json({ msg: 'Please provide subject_name, subject_code, and credits' });
+    return res
+      .status(400)
+      .json({ msg: "Please provide subject_name, subject_code, and credits" });
   }
 
   try {
     // Check if subject_code already exists
     const subjectExists = await Subject.findOne({ where: { subject_code } });
     if (subjectExists) {
-      return res.status(400).json({ msg: 'Subject code already exists' });
+      return res.status(400).json({ msg: "Subject code already exists" });
     }
 
     const newSubject = await Subject.create({
@@ -64,7 +74,7 @@ exports.createSubject = async (req, res) => {
     res.status(201).json(newSubject);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).send("Server Error");
   }
 };
 
@@ -73,19 +83,27 @@ exports.createSubject = async (req, res) => {
 // @access  Admin
 exports.updateSubject = async (req, res) => {
   const { id } = req.params;
-  const { subject_name, subject_code, description, credits, hours_per_week, is_elective, status } = req.body;
+  const {
+    subject_name,
+    subject_code,
+    description,
+    credits,
+    hours_per_week,
+    is_elective,
+    status,
+  } = req.body;
 
   try {
     let subject = await Subject.findByPk(id);
     if (!subject) {
-      return res.status(404).json({ msg: 'Subject not found' });
+      return res.status(404).json({ msg: "Subject not found" });
     }
 
     // Check if subject_code is being changed and if the new one already exists
     if (subject_code && subject_code !== subject.subject_code) {
       const subjectExists = await Subject.findOne({ where: { subject_code } });
       if (subjectExists) {
-        return res.status(400).json({ msg: 'Subject code already exists' });
+        return res.status(400).json({ msg: "Subject code already exists" });
       }
     }
 
@@ -102,7 +120,7 @@ exports.updateSubject = async (req, res) => {
     res.json(subject);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).send("Server Error");
   }
 };
 
@@ -114,14 +132,14 @@ exports.deleteSubject = async (req, res) => {
     const subject = await Subject.findByPk(req.params.id);
 
     if (!subject) {
-      return res.status(404).json({ msg: 'Subject not found' });
+      return res.status(404).json({ msg: "Subject not found" });
     }
 
     await subject.destroy();
 
-    res.json({ msg: 'Subject removed successfully' });
+    res.json({ msg: "Subject removed successfully" });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).send("Server Error");
   }
 };

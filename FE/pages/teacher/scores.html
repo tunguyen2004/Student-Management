@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Quản lý điểm (Giáo viên)</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <!-- Bạn có thể giữ các css global sẵn có -->
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="/assets/css/components.css" />
+
+    <style>
+        /* ====== Minimal styles cho page điểm ====== */
+        body {
+            background: #f6f8fb;
+            color: #0f172a;
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+        }
+
+        .wrap {
+            max-width: 1200px;
+            margin: 80px auto 40px;
+            padding: 0 16px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 6px 24px rgba(2, 6, 23, 0.07);
+            padding: 18px;
+        }
+
+        .title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0 0 14px;
+        }
+
+        .title h2 {
+            font-size: 20px;
+            margin: 0;
+        }
+
+        .filters {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .filters .input,
+        .filters select,
+        .filters button {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: #fff;
+        }
+
+        .filters button {
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        .filters button:hover {
+            background: #1d4ed8;
+        }
+
+        .table-wrap {
+            overflow: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            background: #f8fafc;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: .02em;
+            color: #334155;
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        tbody td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 14px;
+        }
+
+        .score-input {
+            width: 90px;
+            padding: 8px 10px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            text-align: center;
+            outline: none;
+            transition: border-color .15s, box-shadow .15s;
+        }
+
+        .note-input {
+            width: 100%;
+            min-width: 180px;
+            padding: 8px 10px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color .15s, box-shadow .15s;
+        }
+
+        .score-input:focus,
+        .note-input:focus {
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, .15);
+        }
+
+        .cell-status {
+            font-size: 12px;
+            margin-top: 4px;
+            min-height: 18px;
+        }
+
+        .saving {
+            color: #a16207;
+        }
+
+        /* amber */
+        .saved {
+            color: #15803d;
+        }
+
+        /* green */
+        .error {
+            color: #b91c1c;
+        }
+
+        /* red   */
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 999px;
+            padding: 6px 10px;
+            background: #eef2ff;
+            color: #3730a3;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .footer-meta {
+            margin-top: 12px;
+            color: #475569;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- HEADER -->
+    <header class="topbar">
+        <div class="logo">
+            <img src="/assets/img/icons/logowebhs.png" alt="logo"
+                style="height:40px;width:auto;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.08);margin-right:10px;">
+            <span style="font-size:20px;font-weight:700;letter-spacing:1px;color:#fff;">MinhThu</span>
+        </div>
+        <nav class="menu">
+            <a href="/pages/teacher/dashboard.html" class="menu-link active">Tổng quan</a>
+            <a href="/pages/teacher/teaching-list.html" class="menu-link">Phân công giảng dạy</a>
+            <a href="/pages/teacher/class-students.html" class="menu-link">Danh sách học sinh</a>
+            <a href="/pages/teacher/grades/list.html" class="menu-link">Quản lý điểm</a>
+            <a href="/pages/teacher/subject-statistics.html" class="menu-link">Thống kê môn học</a>
+        </nav>
+
+        <div class="user-section">
+            <a href="/pages/profile/view-profile.html" style="margin-left:15px; color: #fff;text-decoration: none;">
+                <span>Xin chào, <strong>Admin</strong></span>
+            </a>
+            <button class="logout-btn" onclick="logout()">Đăng xuất</button>
+        </div>
+    </header>
+
+    <header class="topbar">
+        <div class="logo" style="padding:0 16px;">
+            <span style="font-weight:700;">Giáo viên</span> — Quản lý điểm
+        </div>
+    </header>
+
+    <div class="wrap">
+        <div class="card">
+            <div class="title">
+                <span class="pill">Bảng điểm — Auto-save</span>
+                <h2>Nhập điểm theo lớp / môn</h2>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters">
+                <select id="selectClass" aria-label="Chọn lớp">
+                    <option value="">-- Chọn lớp --</option>
+                </select>
+
+                <select id="selectSubject" aria-label="Chọn môn" disabled>
+                    <option value="">-- Chọn môn --</option>
+                </select>
+
+                <select id="selectSemester" aria-label="Chọn học kỳ">
+                    <option value="1">Học kỳ 1</option>
+                    <option value="2">Học kỳ 2</option>
+                </select>
+
+                <select id="selectYear" aria-label="Chọn năm học">
+                    <option value="2024-2025">2024-2025</option>
+                    <option value="2025-2026">2025-2026</option>
+                </select>
+
+                <button id="btnLoad">Nạp dữ liệu</button>
+            </div>
+
+            <!-- Table -->
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="min-width:110px">Mã HS</th>
+                            <th style="min-width:200px">Họ và tên</th>
+                            <th style="min-width:120px">Điểm 15 phút</th>
+                            <th style="min-width:120px">Điểm 45 phút</th>
+                            <th style="min-width:120px">Điểm Thi</th>
+                            <th style="min-width:220px">Ghi chú</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scoreBody">
+                        <!-- render bằng JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="footer-meta" id="pageHint">
+                Chọn lớp, môn, học kỳ, năm học rồi bấm <b>Nạp dữ liệu</b>.
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/auth.js"></script>
+
+    <script>
+        // ====== CONFIG ======
+        const API = '/api'; // prefix API của bạn
+        const authHeader = () => {
+            const token = localStorage.getItem('token');
+            return {
+                'Authorization': token ? 'Bearer ' + token : ''
+            };
+        };
+
+        // State
+        let currentClassId = '';
+        let currentSubjectId = '';
+        let currentAssignmentId = ''; // cần cho POST scores
+        let currentSemester = '1';
+        let currentYear = '2024-2025';
+
+        // Maps điểm: key = `${studentId}:${type}` => { id, score, notes }
+        const scoreIndex = new Map();
+        // Danh sách học sinh hiện tại
+        let students = [];
+
+        // ====== Startup ======
+        document.addEventListener('DOMContentLoaded', () => {
+            initFilters();
+            bindEvents();
+        });
+
+        async function initFilters() {
+            await loadClassesOfTeacher();
+            // semester & year default ok
+        }
+
+        function bindEvents() {
+            document.getElementById('selectClass').addEventListener('change', async (e) => {
+                currentClassId = e.target.value;
+                scoreIndex.clear();
+                students = [];
+                clearTable();
+
+                if (!currentClassId) {
+                    setSubjectDisabled(true);
+                    return;
+                }
+                await loadSubjectsOfClass(currentClassId);
+            });
+
+            document.getElementById('selectSubject').addEventListener('change', (e) => {
+                currentSubjectId = e.target.value;
+                // lấy assignment_id từ option dataset nếu có
+                const opt = e.target.selectedOptions[0];
+                currentAssignmentId = opt ? (opt.dataset.assignmentId || '') : '';
+            });
+
+            document.getElementById('selectSemester').addEventListener('change', (e) => {
+                currentSemester = e.target.value;
+            });
+
+            document.getElementById('selectYear').addEventListener('change', (e) => {
+                currentYear = e.target.value;
+            });
+
+            document.getElementById('btnLoad').addEventListener('click', loadTableData);
+        }
+
+        function setSubjectDisabled(disabled) {
+            const subjectSel = document.getElementById('selectSubject');
+            subjectSel.disabled = disabled;
+            if (disabled) {
+                subjectSel.innerHTML = '<option value="">-- Chọn môn --</option>';
+            }
+        }
+
+        function clearTable() {
+            document.getElementById('scoreBody').innerHTML = '';
+            document.getElementById('pageHint').textContent = 'Chọn lớp, môn, học kỳ, năm học rồi bấm Nạp dữ liệu.';
+        }
+
+        // ====== API Calls ======
+        async function loadClassesOfTeacher() {
+            const res = await fetch(`${API}/assignments/my-classes`, { headers: authHeader() });
+            if (!res.ok) { console.error('loadClassesOfTeacher failed'); return; }
+            const data = await res.json(); // expect [{id, class_name}]
+            const sel = document.getElementById('selectClass');
+            sel.innerHTML = '<option value="">-- Chọn lớp --</option>';
+            data.forEach(cls => {
+                sel.innerHTML += `<option value="${cls.id}">${cls.class_name}</option>`;
+            });
+        }
+
+        async function loadSubjectsOfClass(classId) {
+            const res = await fetch(`${API}/assignments/class/${classId}/subjects`, { headers: authHeader() });
+            const sel = document.getElementById('selectSubject');
+            if (!res.ok) {
+                sel.innerHTML = '<option value="">-- Chọn môn --</option>';
+                sel.disabled = true;
+                console.error('loadSubjectsOfClass failed');
+                return;
+            }
+            const subjects = await res.json(); // expect [{id, subject_name, assignment_id}]
+            sel.innerHTML = '<option value="">-- Chọn môn --</option>';
+            subjects.forEach(s => {
+                sel.innerHTML += `<option value="${s.id}" data-assignment-id="${s.assignment_id || ''}">${s.subject_name}</option>`;
+            });
+            sel.disabled = false;
+        }
+
+        async function loadStudentsByClass(classId) {
+            const res = await fetch(`${API}/students/class/${classId}`, { headers: authHeader() });
+            if (!res.ok) throw new Error('loadStudentsByClass failed');
+            return res.json(); // expect array
+        }
+
+        async function loadScoresByClass(params) {
+            const { classId, subjectId, semester, schoolYear } = params;
+            const url = `${API}/scores/class/${classId}?subject_id=${encodeURIComponent(subjectId)}&semester=${encodeURIComponent(semester)}&school_year=${encodeURIComponent(schoolYear)}`;
+            const res = await fetch(url, { headers: authHeader() });
+            if (!res.ok) throw new Error('loadScoresByClass failed');
+            return res.json(); // expect array of scores
+        }
+
+        // Nếu API subjects không trả assignment_id, có thể fallback tìm assignment:
+        async function lookupAssignmentId(classId, subjectId) {
+            // Bạn có thể tạo endpoint riêng: /api/assignments/lookup?class_id=&subject_id=
+            // Ở đây demo giả định có endpoint đó:
+            try {
+                const res = await fetch(`${API}/assignments/lookup?class_id=${classId}&subject_id=${subjectId}`, { headers: authHeader() });
+                if (res.ok) {
+                    const data = await res.json();
+                    return data?.assignment_id || '';
+                }
+            } catch (e) { }
+            return '';
+        }
+
+        // ====== Render & Merge ======
+        async function loadTableData() {
+            if (!currentClassId || !currentSubjectId || !currentSemester || !currentYear) {
+                alert('Vui lòng chọn đủ Lớp / Môn / Học kỳ / Năm học');
+                return;
+            }
+
+            // Đảm bảo có assignment_id (POST /scores cần)
+            if (!currentAssignmentId) {
+                currentAssignmentId = await lookupAssignmentId(currentClassId, currentSubjectId);
+            }
+
+            document.getElementById('pageHint').textContent = 'Đang tải dữ liệu…';
+
+            try {
+                const [stuList, scoreList] = await Promise.all([
+                    loadStudentsByClass(currentClassId),
+                    loadScoresByClass({
+                        classId: currentClassId,
+                        subjectId: currentSubjectId,
+                        semester: currentSemester,
+                        schoolYear: currentYear
+                    })
+                ]);
+
+                students = Array.isArray(stuList) ? stuList : (stuList?.data || []);
+                // Xây index điểm
+                scoreIndex.clear();
+                (Array.isArray(scoreList) ? scoreList : []).forEach(sc => {
+                    // key theo học sinh + loại điểm
+                    const key = `${sc.student_id}:${sc.score_type}`;
+                    scoreIndex.set(key, { id: sc.id, score: sc.score, notes: sc.notes || '' });
+                });
+
+                renderTable();
+                document.getElementById('pageHint').textContent = `Đã tải ${students.length} học sinh. Nhập điểm để auto lưu.`;
+            } catch (err) {
+                console.error(err);
+                document.getElementById('pageHint').textContent = 'Lỗi tải dữ liệu. Vui lòng thử lại.';
+            }
+        }
+
+        function renderTable() {
+            const body = document.getElementById('scoreBody');
+            body.innerHTML = '';
+
+            const rowsHtml = students.map(s => {
+                const s15 = scoreIndex.get(`${s.id}:15ph`);
+                const s45 = scoreIndex.get(`${s.id}:45ph`);
+                const sThi = scoreIndex.get(`${s.id}:thi`);
+                const note = s15?.notes || s45?.notes || sThi?.notes || ''; // tuỳ bạn gom notes
+
+                return `
+          <tr data-student-id="${s.id}">
+            <td>${s.student_code}</td>
+            <td>${s.full_name}</td>
+
+            <td>
+              <input class="score-input" type="number" min="0" max="10" step="0.1"
+                     value="${s15?.score ?? ''}"
+                     data-type="15ph" />
+              <div class="cell-status" data-status="15ph"></div>
+            </td>
+
+            <td>
+              <input class="score-input" type="number" min="0" max="10" step="0.1"
+                     value="${s45?.score ?? ''}"
+                     data-type="45ph" />
+              <div class="cell-status" data-status="45ph"></div>
+            </td>
+
+            <td>
+              <input class="score-input" type="number" min="0" max="10" step="0.1"
+                     value="${sThi?.score ?? ''}"
+                     data-type="thi" />
+              <div class="cell-status" data-status="thi"></div>
+            </td>
+
+            <td>
+              <input class="note-input" type="text" value="${note}" data-type="notes" placeholder="Ghi chú (optional)" />
+              <div class="cell-status" data-status="notes"></div>
+            </td>
+          </tr>
+        `;
+            }).join('');
+
+            body.innerHTML = rowsHtml;
+
+            // Gắn auto-save listeners
+            body.querySelectorAll('.score-input').forEach(inp => {
+                inp.addEventListener('blur', handleScoreBlur);
+                inp.addEventListener('keypress', e => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        inp.blur();
+                    }
+                });
+            });
+
+            body.querySelectorAll('.note-input').forEach(inp => {
+                inp.addEventListener('blur', handleNoteBlur);
+            });
+        }
+
+        // ====== Auto Save Handlers ======
+        async function handleScoreBlur(e) {
+            const input = e.target;
+            const row = input.closest('tr');
+            const studentId = row.dataset.studentId;
+            const type = input.dataset.type;
+            const value = input.value.trim();
+
+            const status = row.querySelector(`.cell-status[data-status="${type}"]`);
+            setStatus(status, 'saving');
+
+            if (value === '') {
+                // Cho phép xoá điểm? Nếu cần, thêm DELETE/PATCH null ở đây
+                setStatus(status, 'saved', 'Để trống (không lưu)');
+                return;
+            }
+
+            const num = Number(value);
+            if (Number.isNaN(num) || num < 0 || num > 10) {
+                setStatus(status, 'error', 'Điểm phải 0–10');
+                return;
+            }
+
+            const key = `${studentId}:${type}`;
+            const exist = scoreIndex.get(key);
+
+            try {
+                if (exist?.id) {
+                    // PATCH update
+                    const ok = await patchScore(exist.id, { score: num });
+                    if (!ok) throw new Error('Patch fail');
+                    // cập nhật cache
+                    exist.score = num;
+                    setStatus(status, 'saved', 'Đã lưu');
+                } else {
+                    // POST create
+                    const payload = {
+                        student_id: Number(studentId),
+                        subject_id: Number(currentSubjectId),
+                        assignment_id: Number(currentAssignmentId || 0),
+                        class_id: Number(currentClassId),
+                        score_type: type,
+                        score: num,
+                        semester: currentSemester,
+                        school_year: currentYear
+                    };
+                    const created = await postScore(payload);
+                    if (!created?.id) throw new Error('Post fail');
+                    scoreIndex.set(key, { id: created.id, score: num, notes: '' });
+                    setStatus(status, 'saved', 'Đã lưu');
+                }
+            } catch (err) {
+                console.error(err);
+                setStatus(status, 'error', 'Lỗi lưu');
+            }
+        }
+
+        async function handleNoteBlur(e) {
+            const input = e.target;
+            const row = input.closest('tr');
+            const studentId = row.dataset.studentId;
+            const noteVal = input.value;
+
+            const status = row.querySelector(`.cell-status[data-status="notes"]`);
+            setStatus(status, 'saving');
+
+            // Quy ước: lưu notes ghép vào bất kỳ bản ghi nào đã có (ưu tiên thi → 45ph → 15ph)
+            const order = ['thi', '45ph', '15ph'];
+            let target = null;
+            for (const t of order) {
+                const ex = scoreIndex.get(`${studentId}:${t}`);
+                if (ex?.id) { target = { key: `${studentId}:${t}`, rec: ex }; break; }
+            }
+
+            try {
+                if (target) {
+                    const ok = await patchScore(target.rec.id, { notes: noteVal });
+                    if (!ok) throw new Error('Patch fail');
+                    target.rec.notes = noteVal;
+                    setStatus(status, 'saved', 'Đã lưu');
+                } else {
+                    // Chưa có bản ghi điểm nào → có thể tạo 1 bản ghi "ghi chú" gắn vào loại 15ph (tuỳ nhu cầu)
+                    const payload = {
+                        student_id: Number(studentId),
+                        subject_id: Number(currentSubjectId),
+                        assignment_id: Number(currentAssignmentId || 0),
+                        class_id: Number(currentClassId),
+                        score_type: '15ph',
+                        score: 0,              // hoặc để 0.0
+                        notes: noteVal,
+                        semester: currentSemester,
+                        school_year: currentYear
+                    };
+                    const created = await postScore(payload);
+                    if (!created?.id) throw new Error('Post fail');
+                    scoreIndex.set(`${studentId}:15ph`, { id: created.id, score: 0, notes: noteVal });
+                    setStatus(status, 'saved', 'Đã lưu');
+                }
+            } catch (err) {
+                console.error(err);
+                setStatus(status, 'error', 'Lỗi lưu');
+            }
+        }
+
+        function setStatus(el, type, text = '') {
+            if (!el) return;
+            el.classList.remove('saving', 'saved', 'error');
+            el.classList.add(type);
+            el.textContent = text || (type === 'saving' ? 'Saving…' : type === 'saved' ? 'Saved' : 'Error');
+        }
+
+        // ====== HTTP helpers ======
+        async function postScore(payload) {
+            // BE yêu cầu created_by từ token → middleware xử lý
+            const res = await fetch(`${API}/scores`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...authHeader() },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) return res.json();
+            // Nếu BE trả 409 (điểm đã tồn tại) → bạn có thể xử lý nâng cao ở đây
+            return null;
+        }
+
+        async function patchScore(id, body) {
+            const res = await fetch(`${API}/scores/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', ...authHeader() },
+                body: JSON.stringify(body)
+            });
+            return res.ok;
+        }
+    </script>
+</body>
+
+</html>

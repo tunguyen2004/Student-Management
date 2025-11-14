@@ -1,2 +1,350 @@
-<!-- Xem thông tin cá nhân -->
-<section>Thông tin cá nhân</section>
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông tin cá nhân</title>
+    <link rel="stylesheet" href="/assets/css/main.css">
+
+    <style>
+        body {
+            background: #f1f5f9;
+            font-family: "Segoe UI", sans-serif;
+            margin: 0;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding-bottom: 50px;
+        }
+
+        .profile-container {
+            max-width: 900px;
+            /* margin: 40px auto; */
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            background: #dbeafe;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            color: #1e3a8a;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        h2 {
+            margin-top: 15px;
+            font-size: 26px;
+            color: #0f172a;
+        }
+
+        .section-title {
+            margin-top: 30px;
+            margin-bottom: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #1e293b;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .info-card {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .info-label {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .info-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        @media(max-width: 600px) {
+            .avatar {
+                width: 90px;
+                height: 90px;
+                font-size: 32px;
+            }
+
+            h2 {
+                font-size: 22px;
+            }
+        }
+
+        .info-card {
+            background: #f8fafc;
+            padding: 15px 18px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .info-label {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 16px;
+            color: #111827;
+            font-weight: 600;
+        }
+
+        .edit-input {
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        .edit-input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 4px rgba(37, 99, 235, 0.4);
+        }
+    </style>
+</head>
+
+
+
+<body>
+    <div id="editModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4);
+            align-items:center; justify-content:center; z-index:10000;">
+
+        <div style="background:white; width:450px; padding:25px; border-radius:14px;
+                box-shadow:0 10px 30px rgba(0,0,0,0.1);">
+
+            <h2 style="margin-top:0; color:#1e293b;">Chỉnh sửa thông tin</h2>
+
+            <div style="display:flex; flex-direction:column; gap:12px; margin-top:15px;">
+
+                <input id="editFullName" class="edit-input" placeholder="Họ tên">
+                <input id="editPhone" class="edit-input" placeholder="Số điện thoại">
+                <input id="editEmail" class="edit-input" placeholder="Email">
+                <input id="editAddress" class="edit-input" placeholder="Địa chỉ">
+
+                <!-- Chỉ hiện nếu là teacher -->
+                <div id="teacherEditFields" style="display:none;">
+                    <input id="editSpecialization" class="edit-input" placeholder="Chuyên môn">
+                    <input id="editDegree" class="edit-input" placeholder="Học vị">
+                </div>
+
+            </div>
+
+            <div style="text-align:right; margin-top:20px;">
+                <button onclick="closeEditModal()"
+                    style="padding:8px 14px; border:none; background:#e5e7eb; border-radius:6px; cursor:pointer;">
+                    Hủy
+                </button>
+
+                <button onclick="saveProfileUpdate()"
+                    style="padding:8px 14px; border:none; background:#2563eb; color:white; border-radius:6px; cursor:pointer;">
+                    Lưu
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <main>
+        <div class="action-buttons" style="justify-content: space-between; width: 1000px; display: flex;"
+            onclick="goHome()">
+            <button onclick="goHome()"
+                style="margin: 20px; padding:10px 18px; border:none; background:#2563eb; color:white; border-radius:8px; cursor:pointer;">
+                ← Quay về trang chủ
+            </button>
+
+            <!-- <button class="btn btn-primary"
+                style="margin: 20px; padding:10px 18px; border:none; background:#ffd44d; color:white; border-radius:8px; cursor:pointer;">Chỉnh
+                sửa thông tin
+            </button> -->
+        </div>
+
+        <div class="profile-header">
+
+            <!-- ✅ Avatar đã thêm lại -->
+
+            <div class="profile-info">
+                <h1 id="profileName">Tên mặc định</h1>
+                <div class="role" id="profileRole">Vai trò</div>
+                <div class="teacher-code" id="teacherCodeHeader">---</div>
+            </div>
+        </div>
+
+        <div class="profile-container">
+
+            <!-- THÔNG TIN CÁ NHÂN -->
+            <div class="info-section">
+                <h3>Thông tin cá nhân</h3>
+
+                <div class="info-grid">
+
+                    <div class="info-item">
+                        <span class="info-label">Tên đăng nhập</span>
+                        <div class="info-value" id="username"></div>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Email</span>
+                        <div class="info-value" id="email"></div>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Số điện thoại</span>
+                        <div class="info-value" id="phone"></div>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Ngày sinh</span>
+                        <div class="info-value" id="dob"></div>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Giới tính</span>
+                        <div class="info-value" id="gender"></div>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Trạng thái</span>
+                        <div class="info-value"><span id="statusBadge"></span></div>
+                    </div>
+
+                    <div class="info-item full-width">
+                        <span class="info-label">Địa chỉ</span>
+                        <div class="info-value" id="address"></div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- THÔNG TIN GIÁO VIÊN -->
+            <div class="info-section" id="teacherSection" style="display:none;">
+                <h3>Thông tin công việc</h3>
+
+                <div class="info-grid">
+
+                    <div class="info-item">
+                        <span class="info-label">Mã giáo viên</span>
+                        <div class="info-value" id="teacherCode"></div>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Chuyên môn</span>
+                        <div class="info-value" id="specialization"></div>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Học vị</span>
+                        <div class="info-value" id="degree"></div>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Ngày bắt đầu</span>
+                        <div class="info-value" id="startDate"></div>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Lương</span>
+                        <div class="info-value" id="salary"></div>
+                    </div>
+
+                    <div class="info-item full-width">
+                        <span class="info-label">Tài khoản ngân hàng</span>
+                        <div class="info-value" id="bankInfo"></div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- THÔNG TIN HỆ THỐNG -->
+            <div class="info-section">
+                <h3>Thông tin hệ thống</h3>
+
+                <div class="info-grid">
+
+                    <div class="info-item">
+                        <span class="info-label">Ngày tạo</span>
+                        <div class="info-value" id="createdAt"></div>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Cập nhật lần cuối</span>
+                        <div class="info-value" id="updatedAt"></div>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Đăng nhập lần cuối</span>
+                        <div class="info-value" id="lastLogin"></div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="openEditModal()"
+                style="margin: 20px; padding:10px 18px; border:none; background:#ffd44d; color:white; border-radius:8px; cursor:pointer;">Chỉnh
+                sửa thông tin
+            </button>
+            <!-- <button
+                style="margin: 20px; padding:10px 18px; border:none; background:#007bff; color:white; border-radius:8px; cursor:pointer;">Đổi
+                mật khẩu
+            </button> -->
+        </div>
+    </main>
+
+
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script src="/assets/js/profile.js"></script>
+
+    <script>
+        function goHome() {
+            const role = localStorage.getItem("role");
+
+            if (role === "admin") {
+                window.location.href = "/pages/admin/dashboard.html";
+            } else if (role === "teacher") {
+                window.location.href = "/pages/teacher/home.html";
+            } else if (role === "student") {
+                window.location.href = "/pages/student/home.html";
+            } else {
+                window.location.href = "/index.html"; // fallback
+            }
+        }
+    </script>
+
+</body>
+
+</html>

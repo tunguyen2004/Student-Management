@@ -1,25 +1,34 @@
-const { Class, Teacher, User } = require('../models');
+const { Class, Teacher, User } = require("../models");
 
 // @desc    Get all classes
 // @route   GET /api/classes
 // @access  Admin
+
 exports.getAllClasses = async (req, res) => {
   try {
     const classes = await Class.findAll({
-      include: [{
-        model: Teacher,
-        attributes: ['id', 'teacher_code'],
-        include: [{
-          model: User,
-          attributes: ['full_name']
-        }]
-      }],
-      order: [['school_year', 'DESC'], ['grade', 'ASC'], ['class_name', 'ASC']],
+      include: [
+        {
+          model: Teacher,
+          attributes: ["id", "teacher_code"],
+          include: [
+            {
+              model: User,
+              attributes: ["full_name"],
+            },
+          ],
+        },
+      ],
+      order: [
+        ["school_year", "DESC"],
+        ["grade", "ASC"],
+        ["class_name", "ASC"],
+      ],
     });
     res.json(classes);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).send("Server Error");
   }
 };
 
@@ -29,24 +38,28 @@ exports.getAllClasses = async (req, res) => {
 exports.getClassById = async (req, res) => {
   try {
     const singleClass = await Class.findByPk(req.params.id, {
-      include: [{
-        model: Teacher,
-        attributes: ['id', 'teacher_code'],
-        include: [{
-          model: User,
-          attributes: ['full_name']
-        }]
-      }],
+      include: [
+        {
+          model: Teacher,
+          attributes: ["id", "teacher_code"],
+          include: [
+            {
+              model: User,
+              attributes: ["full_name"],
+            },
+          ],
+        },
+      ],
     });
 
     if (!singleClass) {
-      return res.status(404).json({ msg: 'Class not found' });
+      return res.status(404).json({ msg: "Class not found" });
     }
 
     res.json(singleClass);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).send("Server Error");
   }
 };
 
@@ -54,28 +67,39 @@ exports.getClassById = async (req, res) => {
 // @route   POST /api/classes
 // @access  Admin
 exports.createClass = async (req, res) => {
-  const { class_code, class_name, grade, school_year, homeroom_teacher_id, room_number, max_students, status } = req.body;
+  const {
+    class_code,
+    class_name,
+    grade,
+    school_year,
+    homeroom_teacher_id,
+    room_number,
+    max_students,
+    status,
+  } = req.body;
 
   // Validation
   if (!class_code || !class_name || !grade || !school_year) {
-    return res.status(400).json({ msg: 'Please provide class_code, class_name, grade, and school_year' });
+    return res.status(400).json({
+      msg: "Please provide class_code, class_name, grade, and school_year",
+    });
   }
 
   try {
-    const newClass = await Class.create({ 
-        class_code, 
-        class_name, 
-        grade, 
-        school_year, 
-        homeroom_teacher_id, 
-        room_number, 
-        max_students, 
-        status 
+    const newClass = await Class.create({
+      class_code,
+      class_name,
+      grade,
+      school_year,
+      homeroom_teacher_id,
+      room_number,
+      max_students,
+      status,
     });
     res.status(201).json(newClass);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).send("Server Error");
   }
 };
 
@@ -84,12 +108,21 @@ exports.createClass = async (req, res) => {
 // @access  Admin
 exports.updateClass = async (req, res) => {
   const { id } = req.params;
-  const { class_code, class_name, grade, school_year, homeroom_teacher_id, room_number, max_students, status } = req.body;
+  const {
+    class_code,
+    class_name,
+    grade,
+    school_year,
+    homeroom_teacher_id,
+    room_number,
+    max_students,
+    status,
+  } = req.body;
 
   try {
     let singleClass = await Class.findByPk(id);
     if (!singleClass) {
-      return res.status(404).json({ msg: 'Class not found' });
+      return res.status(404).json({ msg: "Class not found" });
     }
 
     singleClass = await singleClass.update(req.body);
@@ -97,7 +130,7 @@ exports.updateClass = async (req, res) => {
     res.json(singleClass);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).send("Server Error");
   }
 };
 
@@ -109,14 +142,14 @@ exports.deleteClass = async (req, res) => {
     const singleClass = await Class.findByPk(req.params.id);
 
     if (!singleClass) {
-      return res.status(404).json({ msg: 'Class not found' });
+      return res.status(404).json({ msg: "Class not found" });
     }
 
     await singleClass.destroy();
 
-    res.json({ msg: 'Class removed successfully' });
+    res.json({ msg: "Class removed successfully" });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).send("Server Error");
   }
 };
