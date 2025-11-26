@@ -37,38 +37,3 @@ module.exports = (sequelize, DataTypes) => {
 
   return Score;
 };
-
-// // src/models/scoreModel.js
-// module.exports = (sequelize, DataTypes) => {
-//   const Score = sequelize.define(
-//     "Score",
-//     {
-//       id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-//       student_id: DataTypes.INTEGER,
-//       subject_id: DataTypes.INTEGER,
-//       class_id: DataTypes.INTEGER,
-//       assignment_id: DataTypes.INTEGER,
-//       score_type: DataTypes.STRING,
-//       score: DataTypes.FLOAT,
-//       semester: DataTypes.INTEGER,
-//       school_year: DataTypes.STRING,
-//       created_by: DataTypes.INTEGER,
-//     },
-//     {
-//       tableName: "scores",
-//       timestamps: true,
-//       underscored: true,
-//     }
-//   );
-
-//   Score.associate = (models) => {
-//     Score.belongsTo(models.Student, { foreignKey: "student_id" });
-//     Score.belongsTo(models.Subject, { foreignKey: "subject_id" });
-//     Score.belongsTo(models.Assignment, { foreignKey: "assignment_id" });
-
-//     // *** FIX QUAN TRỌNG ***
-//     Score.belongsTo(models.Class, { foreignKey: "class_id" });
-//   };
-
-//   return Score;
-// };

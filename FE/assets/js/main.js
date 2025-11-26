@@ -17,6 +17,7 @@ async function login(username, password) {
       localStorage.setItem("loggedUser", JSON.stringify(data.user));
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.user.role);
+      localStorage.setItem("fullName", data.user.full_name);
     }
 
     return data;
@@ -32,6 +33,8 @@ function logout() {
   }
   localStorage.removeItem("loggedUser");
   localStorage.removeItem("token");
+  localStorage.removeItem("role");
+  localStorage.removeItem("fullName");
   window.location.href = "/index.html";
 }
 

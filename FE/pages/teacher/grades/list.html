@@ -195,27 +195,40 @@
 
     <!-- MAIN -->
     <main>
-        <h2 class="page-title">📘 Xem điểm điểm học sinh</h2>
+        <h2 class="page-title">📘 Quản lý điểm học sinh</h2>
 
         <!-- FILTER -->
         <div class="filter-panel">
-            <select id="classSelect" title="Chọn lớp" onchange="loadStudentsAndScores()">
+            <select id="classSelect" title="Chọn lớp">
                 <option value="">-- Chọn lớp --</option>
             </select>
 
-            <select id="subjectSelect" title="Chọn môn học" onchange="loadStudentsAndScores()">
+            <select id="subjectSelect" title="Chọn môn học">
                 <option value="">-- Chọn môn --</option>
             </select>
 
-            <select id="semesterSelect" title="Chọn học kỳ" onchange="loadStudentsAndScores()">
+            <select id="semesterSelect" title="Chọn học kỳ">
                 <option value="1">Học kỳ 1</option>
                 <option value="2">Học kỳ 2</option>
             </select>
+
+            <!-- NĂM HỌC -->
+            <select id="schoolYearSelect" title="Chọn năm học">
+                <option value="">-- Năm học --</option>
+            </select>
+
+            <!-- Nút hành động -->
+            <button type="button" onclick="loadStudentsAndScores()">
+                ✏️ Nhập điểm
+            </button>
+            <button type="button" onclick="viewScores()">
+                👁 Xem điểm
+            </button>
         </div>
 
         <!-- TABLE -->
         <div class="table-wrapper">
-            <table border="1" width="100%">
+            <table id="scoreTable" border="1" width="100%">
                 <thead>
                     <tr>
                         <th>Mã HS</th>
@@ -230,6 +243,8 @@
             </table>
         </div>
     </main>
+
+
 
 
     <script src="/assets/js/main.js"></script>
