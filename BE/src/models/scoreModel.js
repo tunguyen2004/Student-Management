@@ -1,3 +1,4 @@
+// src/models/scoreModel.js
 module.exports = (sequelize, DataTypes) => {
   const Score = sequelize.define(
     "Score",

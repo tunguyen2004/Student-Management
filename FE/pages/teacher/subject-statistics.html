@@ -127,12 +127,13 @@
             <a href="/pages/teacher/teaching-list.html" class="menu-link">Phân công giảng dạy</a>
             <a href="/pages/teacher/class-students.html" class="menu-link">Danh sách học sinh</a>
             <a href="/pages/teacher/grades/list.html" class="menu-link">Quản lý điểm</a>
+            <a href="/pages/teacher/attendance.html" class="menu-link">Điểm danh</a>
             <a href="/pages/teacher/subject-statistics.html" class="menu-link active">Thống kê môn học</a>
         </nav>
 
         <div class="user-section">
             <a href="/pages/profile/view-profile.html" style="margin-left:15px; color: #fff;text-decoration: none;">
-                <span>Xin chào, <strong>Admin</strong></span>
+                <span id="greetingUser">Xin chào, <strong>Admin</strong></span>
             </a>
             <button class="logout-btn" onclick="logout()">Đăng xuất</button>
         </div>
@@ -222,6 +223,13 @@
             <span>🏅 Xếp loại lớp: <strong>Khá</strong></span>
         </div>
     </main>
+
+
+
+    <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/include.js"></script>
 </body>
 
 </html>

@@ -1,3 +1,4 @@
+// src/models/studentModel.js
 module.exports = (sequelize, DataTypes) => {
   const Student = sequelize.define(
     "Student",

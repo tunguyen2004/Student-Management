@@ -1,20 +1,56 @@
-const express = require('express');
+// src/routes/attendanceRoutes.js
+const express = require("express");
 const router = express.Router();
-const {
-    getAttendanceByClass,
-    getAttendanceByStudent,
-    takeAttendance,
-    updateAttendance,
-} = require('../controllers/attendanceController');
-const authMiddleware = require('../middleware/authMiddleware');
-const adminMiddleware = require('../middleware/adminMiddleware');
 
-// Apply auth and admin middleware to all routes in this file
+const authMiddleware = require("../middleware/authMiddleware");
+const teacherMiddleware = require("../middleware/teacherMiddleware");
+const adminMiddleware = require("../middleware/adminMiddleware");
+const attendanceController = require("../controllers/attendanceController");
+
+// ================== GIÁO VIÊN ==================
+// GET /api/attendance/class/:classId?date=&session=
+router.get(
+  "/class/:classId",
+  authMiddleware,
+  teacherMiddleware,
+  attendanceController.getClassAttendanceTeacher
+);
+
+// POST /api/attendance/mark
+router.post(
+  "/mark",
+  authMiddleware,
+  teacherMiddleware,
+  attendanceController.markAttendanceTeacher
+);
+
+// ================== ADMIN ==================
+// giống form assignmentRoutes: từ đây trở xuống là admin, dùng chung middleware
 router.use(authMiddleware, adminMiddleware);
 
-router.get('/class/:class_id', getAttendanceByClass);
-router.get('/student/:student_id', getAttendanceByStudent);
-router.post('/', takeAttendance);
-router.put('/:id', updateAttendance);
+// ⚠️ NHỚ: bulk phải đặt TRƯỚC /admin/:id
+// PATCH /api/attendance/admin/bulk
+router.patch("/admin/bulk", attendanceController.bulkUpsertAttendanceAdmin);
+
+// GET /api/attendance/admin/date?date=&session=
+router.get("/admin/date", attendanceController.getAttendanceByDateAdmin);
+
+// GET /api/attendance/admin/class/:classId?date=&session=
+router.get(
+  "/admin/class/:classId",
+  attendanceController.getClassAttendanceAdmin
+);
+
+// GET /api/attendance/admin/student/:studentId?from=&to=
+router.get(
+  "/admin/student/:studentId",
+  attendanceController.getStudentAttendanceHistoryAdmin
+);
+
+// PATCH /api/attendance/admin/:id
+router.patch("/admin/:id", attendanceController.updateAttendanceAdmin);
+
+// DELETE /api/attendance/admin/:id
+router.delete("/admin/:id", attendanceController.deleteAttendanceAdmin);
 
 module.exports = router;

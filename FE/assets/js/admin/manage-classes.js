@@ -1,3 +1,4 @@
+// assets/js/admin/manage-classes.js
 function initializeClassManagement() {
   loadClasses();
 

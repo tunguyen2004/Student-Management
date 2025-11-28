@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng điều khiển | Giáo viên</title>
+    <link rel="stylesheet" href="/assets/css/main.css">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+
+
+        main {
+            padding: 100px 30px 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+        }
+
+        .card h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            font-size: 28px;
+            color: #2563eb;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        /* --- LÀM ĐẸP GIAO DIỆN DANH SÁCH HỌC SINH --- */
+
+        main {
+            padding: 100px 30px 30px;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        /* FILTER BAR */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: #ffffff;
+            padding: 16px 22px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 12px rgba(148, 163, 184, 0.2);
+        }
+
+        .filter-bar label {
+            font-size: 16px;
+            color: #334155;
+            font-weight: 600;
+        }
+
+        .filter-bar select {
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            font-size: 15px;
+            color: #1e293b;
+            outline: none;
+            transition: all 0.25s ease;
+        }
+
+        .filter-bar select:hover {
+            border-color: #2563eb;
+        }
+
+        .filter-bar select:focus {
+            border: 2px solid #2563eb;
+            box-shadow: 0 0 6px rgba(37, 99, 235, 0.25);
+        }
+
+        /* TABLE */
+        .teaching-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        /* HEADER */
+        .teaching-table thead th {
+            background: linear-gradient(90deg, #2563eb, #3b82f6);
+            color: #fff;
+            padding: 15px;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* ROWS */
+        .teaching-table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .teaching-table tbody tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .teaching-table tbody tr:hover {
+            background: #e8eef7;
+        }
+
+        .teaching-table td {
+            padding: 12px;
+            text-align: center;
+            font-size: 15px;
+            color: #334155;
+        }
+
+        /* Empty trạng thái */
+        #studentTableBody td {
+            padding: 18px;
+            color: #64748b;
+            font-style: italic;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        main {
+            padding: 100px 30px 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .page-header h2 {
+            font-size: 22px;
+            font-weight: bold;
+            color: #1e293b;
+        }
+
+        .btn-add {
+            background: #2563eb;
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 15px;
+        }
+
+        .btn-add:hover {
+            background: #1d4ed8;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        th,
+        td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f1f5f9;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        .actions button {
+            border: none;
+            background: none;
+            cursor: pointer;
+            margin-right: 8px;
+            font-size: 14px;
+            color: #2563eb;
+        }
+
+        .actions button:hover {
+            text-decoration: underline;
+        }
+
+        /* ====================== MAIN LAYOUT & TYPOGRAPHY ====================== */
+        main {
+            padding: 90px 24px 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: #f8fafc;
+        }
+
+        /* Page header */
+        .page-header {
+            margin-bottom: 28px;
+        }
+
+        .page-header h2 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-header h2::before {
+            content: "";
+            display: inline-block;
+            width: 6px;
+            height: 32px;
+            background: #2563eb;
+            border-radius: 4px;
+        }
+
+        /* ====================== FILTER SECTION ====================== */
+        .filter-section {
+            background: white;
+            padding: 20px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            align-items: end;
+        }
+
+        .filter-item label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .filter-item input,
+        .filter-item select {
+            padding: 10px 14px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.2s;
+            background-color: #fff;
+        }
+
+        .filter-item input:focus,
+        .filter-item select:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        /* Nút tải dữ liệu */
+        #adminLoadAttendanceBtn {
+            background: linear-gradient(to right, #2563eb, #3b82f6);
+            color: white;
+            border: none;
+            padding: 0 24px;
+            height: 44px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+        }
+
+        #adminLoadAttendanceBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+        }
+
+        /* ====================== BULK ACTION SECTION ====================== */
+        .bulk-section {
+            background: #fef3c7;
+            padding: 14px 20px;
+            border-radius: 10px;
+            border-left: 5px solid #f59e0b;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            font-size: 15px;
+        }
+
+        .bulk-status-select {
+            min-width: 180px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1.5px solid #fbbf24;
+            background: white;
+        }
+
+        #applyBulkStatusBtn {
+            background: #f59e0b;
+            color: white;
+            border: none;
+            padding: 0 18px;
+            height: 38px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        #applyBulkStatusBtn:hover {
+            background: #d97706;
+        }
+
+        /* ====================== TABLE ====================== */
+        .table-section {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e2e8f0;
+        }
+
+        .table-section table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table-section th {
+            background: linear-gradient(to bottom, #f8fafc, #f1f5f9);
+            padding: 16px 18px;
+            font-weight: 700;
+            font-size: 14.5px;
+            color: #1e293b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .table-section td {
+            padding: 14px 18px;
+            vertical-align: middle;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 15px;
+        }
+
+        .table-section tr:hover {
+            background-color: #f0f7ff;
+            transition: background 0.2s;
+        }
+
+        /* Trạng thái badge */
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .status-present {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-absent {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-late {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-excused {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        /* Select trạng thái trong bảng */
+        td select {
+            padding: 6px 10px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            min-width: 120px;
+        }
+
+        td input[type="text"] {
+            padding: 6px 10px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 200px;
+        }
+
+        /* Nút hành động */
+        .actions {
+            white-space: nowrap;
+        }
+
+        .actions button {
+            background: none;
+            border: none;
+            padding: 6px 10px;
+            margin: 0 4px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .actions .save-btn {
+            color: #16a34a;
+        }
+
+        .actions .save-btn:hover {
+            background: #ecfdf5;
+        }
+
+        .actions .delete-btn {
+            color: #dc2626;
+        }
+
+        .actions .delete-btn:hover {
+            background: #fee2e2;
+        }
+
+        /* Thông báo */
+        #adminAttendanceMessage {
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            margin-top: 16px;
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        #adminAttendanceMessage.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+            opacity: 1;
+        }
+
+        #adminAttendanceMessage.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .filter-row {
+                grid-template-columns: 1fr;
+            }
+
+            #adminLoadAttendanceBtn {
+                width: 100%;
+            }
+
+            .bulk-section {
+                font-size: 14px;
+            }
+        }
+
+        /* Nút chính (xanh dương) */
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: white;
+            border: none;
+            padding: 0 20px;
+            height: 40px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            transition: all 0.25s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        /* Nút lưu tất cả (xanh lá) */
+        #saveAllAttendanceBtn {
+            background: linear-gradient(135deg, #16a34a, #22c55e) !important;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+            min-width: 170px;
+            font-weight: 600;
+        }
+
+        #saveAllAttendanceBtn:hover {
+            box-shadow: 0 8px 20px rgba(34, 197, 94, 0.4);
+        }
+
+        /* Nút áp dụng hàng loạt (vàng cam) */
+        #applyBulkStatusBtn {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+        }
+
+        #applyBulkStatusBtn:hover {
+            box-shadow: 0 8px 20px rgba(251, 191, 36, 0.4);
+        }
+
+        /* ====================== FIX Ô SELECT "ÁP DỤNG CHO TẤT CẢ" – SIÊU ĐẸP ====================== */
+        .bulk-select-wrapper {
+            position: relative;
+            display: inline-block;
+            min-width: 200px;
+        }
+
+        .bulk-select {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 100%;
+            padding: 10px 40px 10px 16px;
+            border: 2.2px solid #f59e0b;
+            border-radius: 12px;
+            background: linear-gradient(to right, #fffbeb, #fff);
+            font-size: 15px;
+            font-weight: 600;
+            color: #92400e;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
+        }
+
+        .bulk-select:hover {
+            border-color: #f97316;
+            background: #fffbeb;
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.25);
+        }
+
+        .bulk-select:focus {
+            outline: none;
+            border-color: #f97316;
+            box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.25);
+            background: #fffbeb;
+        }
+
+        .bulk-select option {
+            background: white;
+            color: #1e293b;
+            font-weight: 500;
+        }
+
+        /* Mũi tên tùy chỉnh */
+        .bulk-select-wrapper .select-arrow {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            font-size: 18px;
+            color: #d97706;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- HEADER -->
+    <header class="topbar">
+        <div class="logo">
+            <img src="/assets/img/icons/logowebhs.png" alt="logo"
+                style="height:40px;width:auto;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.08);margin-right:10px;">
+            <span style="font-size:20px;font-weight:700;letter-spacing:1px;color:#fff;">MinhThu</span>
+        </div>
+        <nav class="menu">
+            <a href="/pages/teacher/dashboard.html" class="menu-link ">Tổng quan</a>
+            <a href="/pages/teacher/teaching-list.html" class="menu-link">Phân công giảng dạy</a>
+            <a href="/pages/teacher/class-students.html" class="menu-link">Danh sách học sinh</a>
+            <a href="/pages/teacher/grades/list.html" class="menu-link ">Quản lý điểm</a>
+            <a href="/pages/teacher/attendance.html" class="menu-link active">Điểm danh</a>
+            <a href="/pages/teacher/subject-statistics.html" class="menu-link">Thống kê môn học</a>
+        </nav>
+
+        <div class="user-section">
+            <a href="/pages/profile/view-profile.html" style="margin-left:15px; color: #fff;text-decoration: none;">
+                <span id="greetingUser">Xin chào, <strong>Admin</strong></span>
+            </a>
+            <button class="logout-btn" onclick="logout()">Đăng xuất</button>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <main>
+        <main>
+            <!-- TIÊU ĐỀ -->
+            <div class="page-header">
+                <h2>Điểm danh lớp học</h2>
+            </div>
+
+            <!-- BỘ LỌC -->
+            <section class="filter-section" style="margin-bottom: 16px;">
+                <div class="filter-row" style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;">
+                    <!-- Ngày -->
+                    <div class="filter-item" style="display:flex;flex-direction:column;min-width:180px;">
+                        <label for="teacherAttendanceDate" style="margin-bottom:6px;">Ngày:</label>
+                        <input type="date" id="teacherAttendanceDate" class="input" />
+                    </div>
+
+                    <!-- Buổi -->
+                    <div class="filter-item" style="display:flex;flex-direction:column;min-width:160px;">
+                        <label for="teacherSessionSelect" style="margin-bottom:6px;">Buổi:</label>
+                        <select id="teacherSessionSelect" class="input">
+                            <option value="morning">Sáng</option>
+                            <option value="afternoon">Chiều</option>
+                        </select>
+                    </div>
+
+                    <!-- Lớp dạy -->
+                    <div class="filter-item" style="display:flex;flex-direction:column;min-width:220px;">
+                        <label for="teacherClassSelect" style="margin-bottom:6px;">Chọn lớp dạy:</label>
+                        <select id="teacherClassSelect" class="input">
+                            <!-- Sẽ load từ API: assignments/teacher -->
+                            <option value="">-- Chọn lớp --</option>
+                        </select>
+                    </div>
+
+                    <!-- Nút tải -->
+                    <button id="teacherLoadAttendanceBtn" class="btn-add" style="height:40px;">
+                        Tải danh sách
+                    </button>
+                </div>
+            </section>
+
+            <!-- ÁP DỤNG & LƯU TẤT CẢ -->
+            <section class="bulk-section" style="margin-bottom: 12px;">
+                <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;">
+                    <span style="font-weight:500;">Áp dụng trạng thái cho tất cả:</span>
+
+                    <div class="select-wrapper bulk-select-wrapper">
+                        <select id="teacherBulkStatusSelect" class="custom-select bulk-select"
+                            title="Chọn trạng thái áp dụng cho tất cả">
+                            <option value="">-- Chọn trạng thái --</option>
+                            <option value="present">Có mặt</option>
+                            <option value="absent">Vắng</option>
+                            <option value="late">Đi muộn</option>
+                            <option value="excused">Có phép</option>
+                        </select>
+                        <span class="select-arrow">▼</span>
+                    </div>
+
+                    <button id="teacherApplyBulkStatusBtn" class="btn-add" style="height:36px;">
+                        Áp dụng cho tất cả
+                    </button>
+
+                    <button id="teacherSaveAllAttendanceBtn" class="btn-add" style="height:36px;background:#16a34a;">
+                        Lưu điểm danh
+                    </button>
+
+                    <!-- <span style="font-size:13px;color:#64748b;">
+                        (Áp dụng sẽ đổi trên màn hình, nút "Lưu điểm danh" mới ghi xuống DB)
+                    </span> -->
+                </div>
+            </section>
+            <div id="teacherAttendanceMessage" class="message" style="margin-top:12px;"></div>
+
+            <!-- BẢNG ĐIỂM DANH -->
+            <section class="table-section">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mã HS</th>
+                            <th>Họ và tên</th>
+                            <th>Ngày</th>
+                            <th>Buổi</th>
+                            <th>Trạng thái</th>
+                            <th>Ghi chú</th>
+                        </tr>
+                    </thead>
+                    <tbody id="teacherAttendanceTableBody">
+                        <tr>
+                            <td colspan="6" style="text-align:center;">
+                                Chưa có dữ liệu, hãy chọn Ngày / Buổi / Lớp và bấm "Tải danh sách".
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+
+    </main>
+
+
+
+
+
+    <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/teacher/attendance.js"></script>
+
+</body>
+
+</html>

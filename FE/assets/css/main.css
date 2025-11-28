@@ -135,3 +135,30 @@ main {
 .logout-btn:hover {
   background: #c0392b;
 }
+
+/* thông báo lưu thành công hoặc thất bại  */
+.message {
+  padding: 12px 18px;
+  border-radius: 8px;
+  margin-top: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.message.show {
+  opacity: 1;
+}
+
+.message.success {
+  background: #d1fae5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+}
+
+.message.error {
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+}

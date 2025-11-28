@@ -41,3 +41,18 @@ function logout() {
 function getLoggedUser() {
   return JSON.parse(localStorage.getItem("loggedUser"));
 }
+
+function loadUsername() {
+  const username = localStorage.getItem("fullName");
+
+  // Nếu có username thì thay Admin bằng tên thật
+  if (username) {
+    document.getElementById(
+      "greetingUser"
+    ).innerHTML = `Xin chào, <strong>${username}</strong>`;
+    console.log("Đã tải tên người dùng:", username);
+  }
+}
+
+// Gọi hàm khi load trang
+window.onload = loadUsername;
