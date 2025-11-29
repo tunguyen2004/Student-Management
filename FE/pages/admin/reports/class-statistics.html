@@ -4,54 +4,95 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Báo cáo kết quả học tập | Admin</title>
+    <title>Thống kê học tập theo lớp | Admin</title>
     <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="/assets/css/components.css" />
 
     <style>
-        body {
-            margin: 0;
-            font-family: "Segoe UI", Arial, sans-serif;
-            background-color: #f8fafc;
-            color: #1e293b;
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --primary-dark: #1d4ed8;
+            --danger: #e74c3c;
+            --danger-hover: #c0392b;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --success: #166534;
+            --success-bg: #dcfce7;
+            --error: #b91c1c;
+            --error-bg: #fee2e2;
+            --info: #0369a1;
+            --info-bg: #e0f2fe;
+            --shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 8px 22px rgba(0, 0, 0, 0.08);
+            --radius: 12px;
+            --transition: all 0.25s ease;
         }
 
-        /* ===== HEADER (TOPBAR) ===== */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            background-color: var(--gray-50);
+            color: var(--gray-800);
+            line-height: 1.6;
+        }
+
+        /* ============== TOPBAR ============== */
         .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #1e293b;
-            color: #fff;
-            padding: 10px 20px;
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            z-index: 10;
             height: 60px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-        }
-
-        .logo {
-            font-size: 18px;
-            font-weight: bold;
+            background: var(--gray-800);
             color: #fff;
             display: flex;
             align-items: center;
-            gap: 6px;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .logo img {
+            height: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .menu {
             display: flex;
-            gap: 15px;
+            gap: 8px;
         }
 
         .menu-link {
             color: #e2e8f0;
             text-decoration: none;
-            padding: 8px 12px;
-            border-radius: 4px;
-            transition: background 0.2s;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 14.5px;
+            transition: var(--transition);
         }
 
         .menu-link:hover {
@@ -59,131 +100,320 @@
         }
 
         .menu-link.active {
-            background: #2563eb;
+            background: var(--primary);
             color: #fff;
-            font-weight: bold;
+            font-weight: 600;
         }
 
         .user-section {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 16px;
+        }
+
+        .user-section a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 15px;
         }
 
         .logout-btn {
-            background: #e74c3c;
-            border: none;
+            background: var(--danger);
             color: white;
-            padding: 8px 12px;
+            border: none;
+            padding: 8px 16px;
             border-radius: 6px;
             cursor: pointer;
+            font-weight: 500;
             transition: background 0.2s;
         }
 
         .logout-btn:hover {
-            background: #c0392b;
+            background: var(--danger-hover);
         }
 
-        /* ===== MAIN CONTENT ===== */
+        /* ============== MAIN LAYOUT ============== */
         main {
-            padding: 100px 30px 30px;
-            max-width: 1200px;
-            margin: 0 auto;
+            margin-top: 80px;
+            padding: 30px;
+            max-width: 1300px;
+            margin-left: auto;
+            margin-right: auto;
+            min-height: calc(100vh - 80px);
         }
 
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .page-header h2 {
-            font-size: 22px;
-            font-weight: bold;
-            color: #1e293b;
-        }
-
-        .filters {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 20px;
+        /* ============== CARD COMMON ============== */
+        .card {
             background: #fff;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            border-radius: var(--radius);
+            padding: 24px 28px;
+            margin-bottom: 28px;
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
         }
 
-        .filters label {
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .card h2,
+        .card h3 {
+            margin: 0 0 16px 0;
+            color: var(--gray-900);
+            font-weight: 700;
+        }
+
+        .card h2 {
+            font-size: 24px;
+        }
+
+        .card h3 {
+            font-size: 19px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ============== FORM CONTROLS ============== */
+        .card label {
+            display: block;
+            font-size: 14px;
             font-weight: 600;
-            margin-right: 6px;
+            color: var(--gray-600);
+            margin-bottom: 6px;
         }
 
-        .filters select {
-            padding: 8px 12px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
+        .input,
+        select.input {
+            width: 200px;
+            padding: 10px 14px;
+            border: 1.5px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 14px;
+            background: #fff;
+            transition: var(--transition);
         }
 
-        .filters button {
-            padding: 10px 16px;
+        .input:focus,
+        select.input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-add {
+            align-self: end;
+            background: var(--primary);
+            color: white;
             border: none;
-            border-radius: 6px;
+            padding: 10px 20px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: 0.2s;
+            font-weight: 600;
+            font-size: 14px;
+            transition: var(--transition);
         }
 
-        .btn-view {
-            background: #2563eb;
-            color: white;
+        .btn-add:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
         }
 
-        .btn-view:hover {
-            background: #1d4ed8;
+        /* Flex nhóm input + button */
+        .card>div[style*="display:flex"] {
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: end;
         }
 
-        .btn-export {
-            background: #10b981;
-            color: white;
-        }
-
-        .btn-export:hover {
-            background: #059669;
-        }
-
+        /* ============== TABLES ============== */
         table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
             background: white;
-            border-radius: 10px;
+            border-radius: var(--radius);
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            box-shadow: var(--shadow-sm);
         }
 
-        th,
-        td {
-            padding: 12px 16px;
-            text-align: left;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        th {
-            background: #f1f5f9;
+        thead th {
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            color: white;
+            padding: 14px 12px;
+            text-transform: uppercase;
+            font-size: 13px;
             font-weight: 600;
-            color: #1e293b;
+            letter-spacing: 0.8px;
         }
 
-        tr:hover {
-            background: #f8fafc;
+        tbody td {
+            padding: 14px 12px;
+            text-align: center;
+            font-size: 14px;
+            color: var(--gray-700);
+            border-bottom: 1px solid var(--gray-200);
         }
 
-        .summary {
+        tbody tr:nth-child(even) {
+            background: var(--gray-50);
+        }
+
+        tbody tr:hover {
+            background: #eef5ff;
+            transition: background 0.2s;
+        }
+
+        /* ============== SUMMARY GRID ============== */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin-top: 16px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: var(--radius);
+            border: 1px solid var(--gray-200);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .summary-card-title {
+            font-size: 14px;
+            color: var(--gray-500);
+            margin-bottom: 8px;
+        }
+
+        .summary-card-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .summary-card-sub {
+            font-size: 13px;
+            color: var(--gray-400);
+            margin-top: 4px;
+        }
+
+        /* ============== MESSAGE BOX ============== */
+        .message {
+            padding: 14px 18px;
             margin-top: 20px;
-            background: #fff;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .message.success {
+            display: block;
+            background: var(--success-bg);
+            color: var(--success);
+            border: 1px solid #bbf7d0;
+        }
+
+        .message.error {
+            display: block;
+            background: var(--error-bg);
+            color: var(--error);
+            border: 1px solid #fecaca;
+        }
+
+        .message.info {
+            display: block;
+            background: var(--info-bg);
+            color: var(--info);
+            border: 1px solid #bae6fd;
+        }
+
+        /* Responsive nhỏ */
+        @media (max-width: 768px) {
+            main {
+                padding: 20px 15px;
+            }
+
+            .topbar {
+                padding: 0 15px;
+                flex-wrap: wrap;
+                height: auto;
+                padding-bottom: 10px;
+            }
+
+            .menu {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                margin-top: 10px;
+            }
+
+            .input,
+            select.input {
+                width: 100%;
+            }
+
+            .card>div[style*="display:flex"] {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn-add {
+                width: 100%;
+            }
+        }
+
+        /* ============== REPORT HEADER - CĂN NGANG ĐẸP ============== */
+        .report-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 8px;
+        }
+
+        .report-header h2 {
+            margin: 0;
+            font-size: 24px;
+            color: var(--gray-900);
+        }
+
+        .report-type-filter {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .report-type-filter label {
+            font-weight: 600;
+            color: var(--gray-600);
+            white-space: nowrap;
+            margin-bottom: 0;
+        }
+
+        .report-type-filter select.input {
+            width: 240px;
+            min-width: 200px;
+        }
+
+        /* Responsive: khi màn hình nhỏ thì xuống dòng */
+        @media (max-width: 640px) {
+            .report-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .report-type-filter {
+                justify-content: flex-start;
+            }
+
+            .report-type-filter select.input {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -192,11 +422,9 @@
     <!-- HEADER -->
     <header class="topbar">
         <div class="logo">
-            <div class="logo">
-                <img src="/assets/img/icons/logowebhs.png" alt="logo"
-                    style="height:40px;width:auto;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.08);margin-right:10px;">
-                <span style="font-size:20px;font-weight:700;letter-spacing:1px;color:#fff;">MinhThu</span>
-            </div>
+            <img src="/assets/img/icons/logowebhs.png" alt="logo"
+                style="height:40px;width:auto;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.08);margin-right:10px;">
+            <span style="font-size:20px;font-weight:700;letter-spacing:1px;color:#fff;">MinhThu</span>
         </div>
 
         <nav class="menu">
@@ -219,97 +447,151 @@
         </div>
     </header>
 
-    <!-- MAIN CONTENT -->
-    <main>
-        <div class="page-header">
-            <h2>📈 Báo cáo kết quả học tập</h2>
-        </div>
+    <main style="padding:100px 30px; max-width:1200px; margin:auto;">
 
-        <!-- Bộ lọc -->
-        <div class="filters">
-            <div>
-                <label for="classSelect">Lớp:</label>
-                <select id="classSelect">
-                    <option>10A1</option>
-                    <option>11A2</option>
-                    <option>12A3</option>
-                </select>
+        <!-- LOẠI BÁO CÁO -->
+        <div class="card">
+            <div class="report-header">
+                <h2>Báo cáo thống kê</h2>
+
+                <div class="report-type-filter">
+                    <label for="reportType">Loại báo cáo:</label>
+                    <select id="reportType" class="input">
+                        <option value="">-- Chọn loại báo cáo --</option>
+                        <option value="class">Báo cáo theo lớp</option>
+                        <option value="subject">Báo cáo theo môn</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <!-- ====================== BÁO CÁO LỚP ====================== -->
+        <div id="classReportSection" style="display:none; margin-top:20px;">
+
+            <div class="card">
+                <h3>Báo cáo theo lớp</h3>
+
+                <div style="display:flex; gap:20px; margin-top:20px;">
+                    <div>
+                        <label>Lớp:</label>
+                        <select id="adminClassSelect" class="input"></select>
+                    </div>
+                    <div>
+                        <label>Năm học:</label>
+                        <select id="adminClassYear" class="input">
+                            <option value="">-- Chọn năm học --</option>
+                        </select>
+                    </div>
+
+                    <button id="loadClassBtn" class="btn-add">Tải báo cáo</button>
+                </div>
             </div>
 
-            <div>
-                <label for="subjectSelect">Môn học:</label>
-                <select id="subjectSelect">
-                    <option>Toán</option>
-                    <option>Văn</option>
-                    <option>Tiếng Anh</option>
-                </select>
+            <div class="card" id="classSummary" style="display:none;">
+                <h3>📌 Tổng quan lớp</h3>
+                <div id="classSummaryContent"></div>
             </div>
 
-            <div>
-                <label for="yearSelect">Năm học:</label>
-                <select id="yearSelect">
-                    <option>2024-2025</option>
-                    <option>2023-2024</option>
-                    <option>2022-2023</option>
-                </select>
+            <div class="card" id="classSubjectBox" style="display:none;">
+                <h3>📘 Thống kê môn trong lớp</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Môn</th>
+                            <th>TB</th>
+                            <th>Cao nhất</th>
+                            <th>Thấp nhất</th>
+                            <th>Tỉ lệ qua</th>
+                        </tr>
+                    </thead>
+                    <tbody id="classSubjectBody"></tbody>
+                </table>
             </div>
 
-            <button class="btn-view" onclick="viewReport()">📊 Xem báo cáo</button>
-            <button class="btn-export" onclick="exportReport()">📤 Xuất Excel/PDF</button>
+            <div class="card" id="classStudentBox" style="display:none;">
+                <h3>👨‍🎓 Xếp loại học sinh</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mã HS</th>
+                            <th>Họ tên</th>
+                            <th>Điểm TB</th>
+                            <th>Xếp loại</th>
+                            <th>Môn yếu nhất</th>
+                        </tr>
+                    </thead>
+                    <tbody id="classStudentBody"></tbody>
+                </table>
+            </div>
+
         </div>
 
-        <!-- Bảng dữ liệu -->
-        <table>
-            <thead>
-                <tr>
-                    <th>Mã HS</th>
-                    <th>Họ tên</th>
-                    <th>Điểm TB</th>
-                    <th>Xếp loại</th>
-                </tr>
-            </thead>
-            <tbody id="reportTable">
-                <tr>
-                    <td>HS001</td>
-                    <td>Nguyễn Văn D</td>
-                    <td>8.5</td>
-                    <td>Giỏi</td>
-                </tr>
-                <tr>
-                    <td>HS002</td>
-                    <td>Trần Thị E</td>
-                    <td>7.2</td>
-                    <td>Khá</td>
-                </tr>
-                <tr>
-                    <td>HS003</td>
-                    <td>Phạm Văn F</td>
-                    <td>5.8</td>
-                    <td>Trung bình</td>
-                </tr>
-            </tbody>
-        </table>
+        <!-- ====================== BÁO CÁO MÔN ====================== -->
+        <div id="subjectReportSection" style="display:none; margin-top:20px;">
 
-        <!-- Tổng kết -->
-        <div class="summary">
-            <p><strong>Tổng số học sinh:</strong> 3</p>
-            <p><strong>Số HS đạt:</strong> 2</p>
-            <p><strong>Số HS không đạt:</strong> 1</p>
-            <p><strong>Tỷ lệ đạt:</strong> 66.7%</p>
+            <div class="card">
+                <h3>Báo cáo theo môn</h3>
+
+                <div style="display:flex; gap:20px; margin-top:20px;">
+                    <div>
+                        <label>Môn:</label>
+                        <select id="adminSubjectSelect" class="input"></select>
+                    </div>
+                    <div>
+                        <label>Năm học:</label>
+                        <select id="adminSubjectYear" class="input">
+                            <option value="">-- Chọn năm học --</option>
+                        </select>
+                    </div>
+
+                    <button id="loadSubjectBtn" class="btn-add">Tải báo cáo</button>
+                </div>
+            </div>
+
+            <div class="card" id="subjectSummary" style="display:none;">
+                <h3>📌 Tổng quan môn</h3>
+                <div id="subjectSummaryContent"></div>
+            </div>
+
+            <div class="card" id="subjectClassBox" style="display:none;">
+                <h3>🏫 Điểm theo lớp</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Lớp</th>
+                            <th>TB</th>
+                            <th>Sĩ số</th>
+                            <th>Tỉ lệ qua</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subjectClassBody"></tbody>
+                </table>
+            </div>
+
+            <div class="card" id="subjectStudentBox" style="display:none;">
+                <h3>👨‍🎓 Học sinh</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mã HS</th>
+                            <th>Họ tên</th>
+                            <th>Điểm TB</th>
+                            <th>Xếp loại</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subjectStudentBody"></tbody>
+                </table>
+            </div>
+
         </div>
+
+        <div id="adminReportMessage" class="message"></div>
+
     </main>
+
     <script src="/assets/js/main.js"></script>
     <script src="/assets/js/auth.js"></script>
-    <script>
-        // Hành động mô phỏng
-        function viewReport() {
-            alert("Đang tải báo cáo theo bộ lọc...");
-        }
-
-        function exportReport() {
-            alert("Xuất báo cáo ra Excel hoặc PDF (tạm giả lập).");
-        }
-    </script>
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/admin/reports.js"></script>
 </body>
 
 </html>

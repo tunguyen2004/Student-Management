@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>thống kê lớp| Giáo viên</title>
+    <link rel="stylesheet" href="/assets/css/main.css">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+
+
+        main {
+            padding: 100px 30px 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+        }
+
+        .card h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            font-size: 28px;
+            color: #2563eb;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        /* --- LÀM ĐẸP GIAO DIỆN DANH SÁCH HỌC SINH --- */
+
+        main {
+            padding: 100px 30px 30px;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        /* FILTER BAR */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: #ffffff;
+            padding: 16px 22px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 12px rgba(148, 163, 184, 0.2);
+        }
+
+        .filter-bar label {
+            font-size: 16px;
+            color: #334155;
+            font-weight: 600;
+        }
+
+        .filter-bar select {
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            font-size: 15px;
+            color: #1e293b;
+            outline: none;
+            transition: all 0.25s ease;
+        }
+
+        .filter-bar select:hover {
+            border-color: #2563eb;
+        }
+
+        .filter-bar select:focus {
+            border: 2px solid #2563eb;
+            box-shadow: 0 0 6px rgba(37, 99, 235, 0.25);
+        }
+
+        /* TABLE */
+        .teaching-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        /* HEADER */
+        .teaching-table thead th {
+            background: linear-gradient(90deg, #2563eb, #3b82f6);
+            color: #fff;
+            padding: 15px;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===================== GLOBAL ===================== */
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #f3f6fb;
+            color: #1e293b;
+        }
+
+        main {
+            padding: 110px 30px 30px;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        /* ===================== PAGE TITLE ===================== */
+        .card h2 {
+            margin: 0;
+            font-size: 26px;
+            color: #1e293b;
+            font-weight: 700;
+        }
+
+        /* ===================== CARD BOX ===================== */
+        .card {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 22px 26px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e7eb;
+            transition: 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            font-size: 20px;
+            font-weight: bold;
+            color: #0f172a;
+        }
+
+
+        /* ===================== FORM ELEMENTS ===================== */
+        .input,
+        select {
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1.5px solid #cbd5e1;
+            background: #fff;
+            font-size: 15px;
+            color: #1e293b;
+            outline: none;
+            transition: all 0.25s ease;
+            min-width: 180px;
+        }
+
+        .input:hover,
+        select:hover {
+            border-color: #2563eb;
+        }
+
+        .input:focus,
+        select:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+
+        /* ===================== BUTTONS ===================== */
+        .btn-add {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            transition: all 0.25s;
+            height: 42px;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.45);
+        }
+
+
+        /* ===================== TABLE ===================== */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 14px;
+            overflow: hidden;
+            background: white;
+        }
+
+        thead th {
+            background: linear-gradient(90deg, #2563eb, #3b82f6);
+            color: #fff;
+            padding: 14px;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        tbody td {
+            padding: 13px;
+            font-size: 15px;
+            color: #334155;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        tbody tr:hover {
+            background: #eef5ff;
+        }
+
+
+        /* ===================== MESSAGE ===================== */
+        .message {
+            margin-top: 16px;
+            padding: 14px 18px;
+            border-radius: 10px;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            font-weight: 500;
+            display: none;
+        }
+
+        .message.show {
+            opacity: 1;
+            display: block;
+        }
+
+        .message.success {
+            background: #d1fae5;
+            border: 1px solid #34d399;
+            color: #065f46;
+        }
+
+        .message.error {
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+        }
+
+
+        /* ===================== RESPONSIVE ===================== */
+        @media (max-width: 768px) {
+            main {
+                padding: 100px 18px 30px;
+            }
+
+            .card {
+                padding: 18px;
+            }
+
+            select,
+            input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- HEADER -->
+    <header class="topbar">
+        <div class="logo">
+            <img src="/assets/img/icons/logowebhs.png" alt="logo"
+                style="height:40px;width:auto;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.08);margin-right:10px;">
+            <span style="font-size:20px;font-weight:700;letter-spacing:1px;color:#fff;">MinhThu</span>
+        </div>
+        <nav class="menu">
+            <a href="/pages/teacher/dashboard.html" class="menu-link ">Tổng quan</a>
+            <a href="/pages/teacher/teaching-list.html" class="menu-link">Phân công giảng dạy</a>
+            <a href="/pages/teacher/class-students.html" class="menu-link">Danh sách học sinh</a>
+            <a href="/pages/teacher/grades/list.html" class="menu-link ">Quản lý điểm</a>
+            <a href="/pages/teacher/attendance.html" class="menu-link">Điểm danh</a>
+            <a href="/pages/teacher/subject-statistics.html" class="menu-link">Thống kê môn học</a>
+            <a href="/pages/teacher/reports/class-statistics.html" class="menu-link active">Thống kê lớp</a>
+
+        </nav>
+
+        <div class="user-section">
+            <a href="/pages/profile/view-profile.html" style="margin-left:15px; color: #fff;text-decoration: none;">
+                <span id="greetingUser">Xin chào, <strong>Admin</strong></span>
+            </a>
+            <button class="logout-btn" onclick="logout()">Đăng xuất</button>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <main style="padding:100px 30px; max-width:1200px; margin:auto;">
+
+        <div class="card">
+            <h2>Thống kê học tập theo lớp</h2>
+
+            <div style="display:flex; gap:20px; margin-top:20px;">
+                <div>
+                    <label>Lớp dạy:</label>
+                    <select id="teacherClassReportSelect" class="input" title="Chọn lớp dạy">
+                        <option value="">-- Chọn lớp --</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Năm học:</label>
+                    <select id="teacherSchoolYearSelect" class="input" title="Chọn năm học">
+                        <option value="">--chọn năm--</option>
+                    </select>
+                </div>
+
+                <button id="teacherLoadReportBtn" class="btn-add">Tải thống kê</button>
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="card" id="teacherSummaryBox" style="display:none;">
+            <h3>📌 Tổng quan lớp</h3>
+            <div id="teacherSummaryContent"></div>
+        </div>
+
+        <!-- Subjects -->
+        <div class="card" id="teacherSubjectBox" style="display:none;">
+            <h3>📘 Thống kê theo môn</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Môn học</th>
+                        <th>Điểm TB</th>
+                        <th>Cao nhất</th>
+                        <th>Thấp nhất</th>
+                        <th>Tỉ lệ qua môn</th>
+                    </tr>
+                </thead>
+                <tbody id="teacherSubjectBody"></tbody>
+            </table>
+        </div>
+
+        <!-- Students -->
+        <div class="card" id="teacherStudentBox" style="display:none;">
+            <h3>👨‍🎓 Xếp loại học sinh</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mã HS</th>
+                        <th>Họ tên</th>
+                        <th>Điểm TB</th>
+                        <th>Xếp loại</th>
+                        <th>Môn yếu nhất</th>
+                    </tr>
+                </thead>
+                <tbody id="teacherStudentBody"></tbody>
+            </table>
+        </div>
+
+        <div id="teacherReportMessage" class="message"></div>
+
+    </main>
+
+
+
+
+    <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script src="/assets/js/teacher/reports.js"></script>
+</body>
+
+</html>

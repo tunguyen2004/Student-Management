@@ -1,177 +1,200 @@
+//`src/controllers/reportController.js
 const db = require("../models");
 const { sequelize } = db;
 const { QueryTypes } = require("sequelize");
 
-/* -------------------------------------------
-   1. OVERVIEW: Tổng quan học tập của lớp
-------------------------------------------- */
-exports.getClassOverview = async (req, res) => {
+exports.getClassSummary = async (req, res) => {
   try {
-    const classId = parseInt(req.params.classId);
-    const semester = req.query.semester || 1;
-    const schoolYear = req.query.school_year;
+    const classId = req.params.classId;
+    const semester = req.query.semester || null;
+    const schoolYear = req.query.school_year || null;
 
-    if (!classId || !schoolYear)
-      return res
-        .status(400)
-        .json({ message: "Thiếu classId hoặc school_year" });
+    if (!classId)
+      return res.status(400).json({ message: "classId là bắt buộc" });
 
-    // Tổng số học sinh
-    const totalStudents = await sequelize.query(
-      `SELECT COUNT(*) AS total FROM students WHERE class_id = ?`,
+    // ===== LẤY SĨ SỐ ====
+    const [{ total }] = await sequelize.query(
+      "SELECT COUNT(*) AS total FROM students WHERE class_id = ?",
       { replacements: [classId], type: QueryTypes.SELECT }
     );
 
-    // GPA từng học sinh
-    const gpas = await sequelize.query(
-      `
+    // ===== LẤY TỔNG ĐIỂM TB CỦA LỚP =====
+    const avgQuery = `
+      SELECT AVG(score) AS avg_score 
+      FROM scores 
+      WHERE class_id = ?
+      ${semester ? "AND semester = ?" : ""}
+      ${schoolYear ? "AND school_year = ?" : ""}
+    `;
+
+    const avgParams =
+      semester && schoolYear
+        ? [classId, semester, schoolYear]
+        : semester
+        ? [classId, semester]
+        : schoolYear
+        ? [classId, schoolYear]
+        : [classId];
+
+    const [{ avg_score }] = await sequelize.query(avgQuery, {
+      replacements: avgParams,
+      type: QueryTypes.SELECT,
+    });
+
+    // ===== XẾP LOẠI =====
+    const rankQuery = `
       SELECT 
-        s.id AS student_id,
-        AVG(sc.score) AS gpa
-      FROM students s
-      LEFT JOIN scores sc 
-        ON sc.student_id = s.id 
-        AND sc.semester = ? 
-        AND sc.school_year = ?
-      WHERE s.class_id = ?
-      GROUP BY s.id
-      `,
-      {
-        replacements: [semester, schoolYear, classId],
-        type: QueryTypes.SELECT,
-      }
-    );
+        SUM(CASE WHEN avg >= 8 THEN 1 ELSE 0 END) AS gioi_count,
+        SUM(CASE WHEN avg >= 6.5 AND avg < 8 THEN 1 ELSE 0 END) AS kha_count,
+        SUM(CASE WHEN avg >= 5 AND avg < 6.5 THEN 1 ELSE 0 END) AS tb_count,
+        SUM(CASE WHEN avg < 5 THEN 1 ELSE 0 END) AS yeu_count
+      FROM (
+        SELECT student_id, AVG(score) AS avg
+        FROM scores
+        WHERE class_id = ?
+        ${semester ? "AND semester = ?" : ""}
+        ${schoolYear ? "AND school_year = ?" : ""}
+        GROUP BY student_id
+      ) AS t;
+    `;
 
-    // GPA trung bình lớp
-    const classGPA =
-      gpas.reduce((acc, g) => acc + (g.gpa || 0), 0) / gpas.length || 0;
+    const rankParams = avgParams;
 
-    // Phân loại học lực
-    const rating = {
-      gioi: 0,
-      kha: 0,
-      trung_binh: 0,
-      yeu: 0,
-      kem: 0,
+    const rankData = await sequelize.query(rankQuery, {
+      replacements: rankParams,
+      type: QueryTypes.SELECT,
+    });
+
+    const r = rankData[0];
+
+    const result = {
+      total_students: total,
+      avg_score: Number(avg_score || 0),
+
+      gioi_count: r.gioi_count,
+      kha_count: r.kha_count,
+      tb_count: r.tb_count,
+      yeu_count: r.yeu_count,
+
+      gioi_rate: (r.gioi_count / total) * 100,
+      kha_rate: (r.kha_count / total) * 100,
+      tb_rate: (r.tb_count / total) * 100,
+      yeu_rate: (r.yeu_count / total) * 100,
     };
 
-    gpas.forEach((g) => {
-      const gpa = g.gpa || 0;
-      if (gpa >= 8) rating.gioi++;
-      else if (gpa >= 6.5) rating.kha++;
-      else if (gpa >= 5) rating.trung_binh++;
-      else if (gpa >= 3.5) rating.yeu++;
-      else rating.kem++;
-    });
-
-    // Điểm TB theo từng môn
-    const subjectStats = await sequelize.query(
-      `
-      SELECT 
-        sub.id AS subject_id,
-        sub.subject_name,
-        AVG(sc.score) AS avg_score
-      FROM subjects sub
-      LEFT JOIN scores sc ON sc.subject_id = sub.id
-        AND sc.semester = ?
-        AND sc.school_year = ?
-      JOIN students s ON s.id = sc.student_id AND s.class_id = ?
-      GROUP BY sub.id
-      `,
-      {
-        replacements: [semester, schoolYear, classId],
-        type: QueryTypes.SELECT,
-      }
-    );
-
-    return res.json({
-      class_id: classId,
-      total_students: totalStudents[0].total,
-      gpa_average: Number(classGPA.toFixed(2)),
-      rating_distribution: rating,
-      subjects: subjectStats,
-    });
-  } catch (error) {
-    console.error("getClassOverview error:", error);
-    return res.status(500).json({ message: "Lỗi server khi thống kê" });
+    return res.json({ data: result });
+  } catch (err) {
+    console.error("getClassSummary error:", err);
+    return res.status(500).json({ message: "Lỗi server" });
   }
 };
 
-/* -------------------------------------------
-   2. Danh sách học sinh + bảng điểm tổng hợp
-------------------------------------------- */
-exports.getClassStudentScores = async (req, res) => {
+exports.getSubjectStats = async (req, res) => {
   try {
-    const classId = parseInt(req.params.classId);
-    const semester = req.query.semester || 1;
-    const schoolYear = req.query.school_year;
+    const classId = req.params.classId;
+    const semester = req.query.semester || null;
+    const schoolYear = req.query.school_year || null;
 
-    if (!classId || !schoolYear)
-      return res
-        .status(400)
-        .json({ message: "Thiếu classId hoặc school_year" });
-
-    // Load danh sách học sinh
-    const students = await sequelize.query(
-      `SELECT id, student_code, full_name 
-       FROM students WHERE class_id = ? ORDER BY full_name`,
-      { replacements: [classId], type: QueryTypes.SELECT }
-    );
-
-    // Load bảng điểm chi tiết
-    const scoreRows = await sequelize.query(
-      `
-      SELECT
-        s.id AS student_id,
-        sub.id AS subject_id,
+    const query = `
+      SELECT 
+        s.subject_id,
         sub.subject_name,
-        AVG(sc.score) AS avg_score
-      FROM students s
-      JOIN subjects sub
-      LEFT JOIN scores sc 
-        ON sc.student_id = s.id
-        AND sc.subject_id = sub.id
-        AND sc.semester = ?
-        AND sc.school_year = ?
+        AVG(s.score) AS avg_score,
+        MAX(s.score) AS highest_score,
+        MIN(s.score) AS lowest_score,
+        SUM(CASE WHEN s.score >= 5 THEN 1 ELSE 0 END) / COUNT(*) * 100 AS pass_rate
+      FROM scores s
+      JOIN subjects sub ON sub.id = s.subject_id
       WHERE s.class_id = ?
-      GROUP BY s.id, sub.id
-      ORDER BY s.full_name
-      `,
-      {
-        replacements: [semester, schoolYear, classId],
-        type: QueryTypes.SELECT,
-      }
-    );
+      ${semester ? "AND s.semester = ?" : ""}
+      ${schoolYear ? "AND s.school_year = ?" : ""}
+      GROUP BY s.subject_id;
+    `;
 
-    // Gộp theo học sinh
-    const result = students.map((st) => {
-      const subjects = scoreRows
-        .filter((r) => r.student_id === st.id)
-        .map((r) => ({
-          subject_id: r.subject_id,
-          subject_name: r.subject_name,
-          avg: Number((r.avg_score || 0).toFixed(2)),
-        }));
+    const params =
+      semester && schoolYear
+        ? [classId, semester, schoolYear]
+        : semester
+        ? [classId, semester]
+        : schoolYear
+        ? [classId, schoolYear]
+        : [classId];
 
-      const gpa =
-        subjects.reduce((acc, s) => acc + s.avg, 0) / subjects.length || 0;
-
-      return {
-        student_id: st.id,
-        student_code: st.student_code,
-        full_name: st.full_name,
-        scores: subjects,
-        gpa: Number(gpa.toFixed(2)),
-      };
+    const rows = await sequelize.query(query, {
+      replacements: params,
+      type: QueryTypes.SELECT,
     });
 
-    // Xếp hạng
-    result.sort((a, b) => b.gpa - a.gpa);
-    result.forEach((st, index) => (st.rank = index + 1));
+    return res.json({ data: rows });
+  } catch (err) {
+    console.error("getSubjectStats error:", err);
+    return res.status(500).json({ message: "Lỗi server" });
+  }
+};
+exports.getStudentStats = async (req, res) => {
+  try {
+    const classId = req.params.classId;
+    const semester = req.query.semester || null;
+    const schoolYear = req.query.school_year || null;
 
-    return res.json(result);
-  } catch (error) {
-    console.error("getClassStudentScores error:", error);
-    return res.status(500).json({ message: "Lỗi server khi lấy bảng điểm" });
+    const query = `
+      SELECT 
+        st.id AS student_id,
+        st.student_code,
+        st.full_name,
+        AVG(sc.score) AS avg_score,
+        CASE 
+          WHEN AVG(sc.score) >= 8 THEN 'Giỏi'
+          WHEN AVG(sc.score) >= 6.5 THEN 'Khá'
+          WHEN AVG(sc.score) >= 5 THEN 'Trung bình'
+          ELSE 'Yếu'
+        END AS rating,
+        (
+          SELECT sub.subject_name
+          FROM scores s2 
+          JOIN subjects sub ON sub.id = s2.subject_id
+          WHERE s2.student_id = st.id
+            AND s2.class_id = ?
+            ${semester ? "AND s2.semester = ?" : ""}
+            ${schoolYear ? "AND s2.school_year = ?" : ""}
+          ORDER BY s2.score ASC
+          LIMIT 1
+        ) AS weakest_subject_name
+      FROM students st
+      LEFT JOIN scores sc ON sc.student_id = st.id
+        AND sc.class_id = ?
+        ${semester ? "AND sc.semester = ?" : ""}
+        ${schoolYear ? "AND sc.school_year = ?" : ""}
+      WHERE st.class_id = ?
+      GROUP BY st.id;
+    `;
+
+    // ===== TẠO PARAMS ĐÚNG THỨ TỰ =====
+    const params = [];
+
+    // Subquery params (weakest subject)
+    params.push(classId);
+    if (semester) params.push(semester);
+    if (schoolYear) params.push(schoolYear);
+
+    // JOIN params
+    params.push(classId);
+    if (semester) params.push(semester);
+    if (schoolYear) params.push(schoolYear);
+
+    // WHERE st.class_id = ?
+    params.push(classId);
+
+    const rows = await sequelize.query(query, {
+      replacements: params,
+      type: QueryTypes.SELECT,
+    });
+
+    return res.json({ data: rows });
+  } catch (err) {
+    console.error("getStudentStats error:", err);
+    return res.status(500).json({
+      message: "Lỗi server khi lấy bảng điểm",
+    });
   }
 };
