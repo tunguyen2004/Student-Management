@@ -197,6 +197,16 @@
             <h2>👨‍🏫 Danh sách Giáo viên</h2>
             <button class="btn-add" onclick="handleAddTeacher()">+ Thêm giáo viên</button>
         </div>
+        <div style="display:flex; gap:20px; margin-bottom:20px;">
+            <input type="text" id="searchInput" placeholder="Tìm theo mã GV, họ tên, email..."
+                style="padding:10px; width:100%; border:1px solid #ccc; border-radius:6px;">
+
+            <select id="filterSubject" style="padding:10px; border:1px solid #ccc; border-radius:6px;"
+                title="lọc theo môn">
+                <option value="">-- Lọc theo môn dạy --</option>
+            </select>
+        </div>
+
 
         <table>
             <thead>

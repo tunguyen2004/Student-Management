@@ -17,17 +17,52 @@
         }
 
         body {
-            background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+            background-image: url("assets/img/anh/ảnh nèn login.jpg");
+            background-size: cover;
+            /* ảnh phủ toàn màn hình */
+            background-position: center;
+            /* căn giữa */
+            background-repeat: no-repeat;
+            /* không lặp ảnh */
             height: 100vh;
+
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
+        body {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            /* tránh viền bị lệch */
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("assets/img/anh/ảnh nèn login.jpg");
+            background-size: cover;
+            background-position: center;
+            filter: blur(6px);
+            /* độ mờ */
+            transform: scale(1.1);
+            /* chống hở viền khi blur */
+            z-index: -1;
+        }
+
         .wrapper {
             display: flex;
             align-items: center;
-            background: #fff;
+            /* background: #a0c1d085; */
+            background-color: #f8f9c685;
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
@@ -39,6 +74,7 @@
             width: 350px;
             /*height: auto;*/
             display: block;
+            border-radius: 50%;
         }
 
         /* Form đăng nhập */
@@ -50,6 +86,7 @@
             text-align: center;
             margin-bottom: 20px;
             color: #333;
+            font-size: 2.5rem;
         }
 
         .form-group {
@@ -135,7 +172,7 @@
     <div class="wrapper">
         <!-- Logo bên trái -->
         <div class="logo">
-            <img src="/assets/img/icons/logowebhs.png" alt="Logo QLHS">
+            <img src="/assets/img/icons/ChatGPT Image Dec 1, 2025, 08_46_10 AM.png" alt="Logo QLHS">
         </div>
 
         <!-- Form đăng nhập bên phải -->

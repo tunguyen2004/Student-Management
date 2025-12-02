@@ -1,5 +1,7 @@
 console.log("✅ manage-teachers.js loaded");
 
+let allTeachers = []; // lưu toàn bộ danh sách để filter
+
 function initializeTeacherManagement() {
   loadTeachers();
 
@@ -7,76 +9,102 @@ function initializeTeacherManagement() {
   if (teacherForm) {
     teacherForm.addEventListener("submit", handleFormSubmit);
   }
+
+  // Event search & filter
+  document
+    .getElementById("searchInput")
+    ?.addEventListener("input", applyFilters);
+  document
+    .getElementById("filterSubject")
+    ?.addEventListener("change", applyFilters);
 }
 
+/* ============================================================
+   🧩 LOAD DANH SÁCH GIÁO VIÊN
+=============================================================== */
 async function loadTeachers() {
   try {
     const teachers = await getTeachers();
-    const teacherTable = document.getElementById("teacherTable");
-    if (!teacherTable) return;
-    teacherTable.innerHTML = "";
+    allTeachers = teachers; // Lưu tất cả để dùng tìm kiếm
 
-    if (teachers.length === 0) {
-      teacherTable.innerHTML =
-        '<tr><td colspan="6">Không có dữ liệu giáo viên.</td></tr>';
-      return;
-    }
-
-    teachers.forEach((teacher) => {
-      const row = `
-                <tr>
-                    <td>${teacher.Teacher.teacher_code}</td>
-                    <td>${teacher.full_name}</td>
-                    <td>${teacher.email}</td>
-                    <td>${teacher.phone}</td>
-                    <td>${teacher.Teacher.specialization}</td>
-                    <td class="actions">
-                        <button onclick="handleEditTeacher(${teacher.id})">✏️ Sửa</button>
-                        <button onclick="handleDeleteTeacher(${teacher.id})">🗑️ Xóa</button>
-                    </td>
-                </tr>
-            `;
-      teacherTable.innerHTML += row;
-    });
+    renderTeachers(teachers);
+    loadSubjectFilter(teachers);
   } catch (error) {
-    console.error("Lỗi khi tải danh sách giáo viên:", error);
-    const teacherTable = document.getElementById("teacherTable");
-    if (teacherTable) {
-      teacherTable.innerHTML =
-        '<tr><td colspan="6">Lỗi khi tải dữ liệu. Vui lòng thử lại.</td></tr>';
-    }
+    console.error("Lỗi khi tải danh sách:", error);
+    document.getElementById("teacherTable").innerHTML =
+      '<tr><td colspan="6">Lỗi tải dữ liệu.</td></tr>';
   }
 }
 
-function openModal(title = "Thông tin giáo viên") {
-  console.log(">>> OPEN MODAL CALLED");
+/* ============================================================
+   🧩 RENDER TABLE
+=============================================================== */
+function renderTeachers(teachers) {
+  const table = document.getElementById("teacherTable");
+  table.innerHTML = "";
 
-  const modal = document.getElementById("teacherModal");
-  const modalTitle = document.getElementById("modalTitle");
+  if (!teachers || teachers.length === 0) {
+    table.innerHTML = '<tr><td colspan="6">Không có dữ liệu.</td></tr>';
+    return;
+  }
 
-  if (modal) modal.style.display = "flex"; // dùng flex để hiện modal
-  if (modalTitle) modalTitle.textContent = title;
+  teachers.forEach((t) => {
+    table.innerHTML += `
+            <tr>
+                <td>${t.Teacher.teacher_code}</td>
+                <td>${t.full_name}</td>
+                <td>${t.email}</td>
+                <td>${t.phone}</td>
+                <td>${t.Teacher.specialization}</td>
+                <td class="actions">
+                    <button onclick="handleEditTeacher(${t.id})">✏️ Sửa</button>
+                    <button onclick="handleDeleteTeacher(${t.id})">🗑️ Xóa</button>
+                </td>
+            </tr>
+        `;
+  });
 }
 
-function closeModal() {
-  const modal = document.getElementById("teacherModal");
-  if (modal) modal.style.display = "none";
+/* ============================================================
+   🧩 LOAD BỘ LỌC MÔN DẠY
+=============================================================== */
+function loadSubjectFilter(teachers) {
+  const filter = document.getElementById("filterSubject");
+  if (!filter) return;
+
+  const subjects = [...new Set(teachers.map((t) => t.Teacher.specialization))];
+
+  filter.innerHTML = `<option value="">-- Lọc theo môn --</option>`;
+
+  subjects.forEach((sub) => {
+    filter.innerHTML += `<option value="${sub}">${sub}</option>`;
+  });
 }
 
-// function openModal(title) {
-//   const modal = document.getElementById("teacherModal");
-//   const modalTitle = document.getElementById("modalTitle");
-//   modalTitle.textContent = title;
-//   modal.style.display = "block";
-// }
+/* ============================================================
+   🔎 TÌM KIẾM + LỌC
+=============================================================== */
+function applyFilters() {
+  const keyword = document.getElementById("searchInput").value.toLowerCase();
+  const subject = document.getElementById("filterSubject").value;
 
-// function closeModal() {
-//   const modal = document.getElementById("teacherModal");
-//   if (modal) {
-//     modal.style.display = "none";
-//   }
-// }
+  let result = allTeachers.filter((t) => {
+    const matchSearch =
+      t.Teacher.teacher_code.toLowerCase().includes(keyword) ||
+      t.full_name.toLowerCase().includes(keyword) ||
+      t.email.toLowerCase().includes(keyword);
 
+    const matchSubject = subject === "" || t.Teacher.specialization === subject;
+
+    return matchSearch && matchSubject;
+  });
+
+  renderTeachers(result);
+}
+
+/* ============================================================
+   ➕ THÊM GIÁO VIÊN
+=============================================================== */
 function handleAddTeacher() {
   const form = document.getElementById("teacherForm");
   if (form) {
@@ -86,54 +114,55 @@ function handleAddTeacher() {
   openModal("Thêm giáo viên mới");
 }
 
+/* ============================================================
+✏️ SỬA GIÁO VIÊN
+=============================================================== */
 async function handleEditTeacher(id) {
   try {
-    console.log(">>> CLICK EDIT");
-    console.log(document.getElementById("teacherModal"));
-
     const teacher = await getTeacherById(id);
-    const form = document.getElementById("teacherForm");
-    if (form) {
-      document.getElementById("teacherId").value = teacher.id;
-      document.getElementById("teacher_code").value =
-        teacher.Teacher.teacher_code;
-      document.getElementById("username").value = teacher.username;
-      document.getElementById("full_name").value = teacher.full_name;
-      document.getElementById("email").value = teacher.email;
-      document.getElementById("phone").value = teacher.phone;
-      document.getElementById("address").value = teacher.address || "";
-      document.getElementById("date_of_birth").value =
-        teacher.date_of_birth?.split("T")[0] || "";
-      document.getElementById("gender").value = teacher.gender || "male";
 
-      document.getElementById("specialization").value =
-        teacher.Teacher.specialization || "";
-      document.getElementById("degree").value = teacher.Teacher.degree || "";
-      document.getElementById("start_date").value =
-        teacher.Teacher.start_date?.split("T")[0] || "";
+    document.getElementById("teacherId").value = teacher.id;
+    document.getElementById("teacher_code").value =
+      teacher.Teacher.teacher_code;
+    document.getElementById("username").value = teacher.username;
+    document.getElementById("full_name").value = teacher.full_name;
+    document.getElementById("email").value = teacher.email;
+    document.getElementById("phone").value = teacher.phone;
+    document.getElementById("address").value = teacher.address || "";
+    document.getElementById("date_of_birth").value =
+      teacher.date_of_birth?.split("T")[0] || "";
+    document.getElementById("gender").value = teacher.gender || "male";
 
-      document.getElementById("bank_name").value =
-        teacher.Teacher.bank_name || "";
-      document.getElementById("bank_account").value =
-        teacher.Teacher.bank_account || "";
-      document.getElementById("salary").value = teacher.Teacher.salary || "";
-      document.getElementById("notes").value = teacher.Teacher.notes || "";
+    document.getElementById("specialization").value =
+      teacher.Teacher.specialization;
+    document.getElementById("degree").value = teacher.Teacher.degree;
+    document.getElementById("start_date").value =
+      teacher.Teacher.start_date?.split("T")[0] || "";
 
-      document.getElementById("password").value = ""; // không show pass
+    document.getElementById("bank_name").value =
+      teacher.Teacher.bank_name || "";
+    document.getElementById("bank_account").value =
+      teacher.Teacher.bank_account || "";
+    document.getElementById("salary").value = teacher.Teacher.salary || "";
+    document.getElementById("notes").value = teacher.Teacher.notes || "";
 
-      // The password field should be cleared for security
-      document.getElementById("password").value = "";
-    }
-    window.openModal("Cập nhật thông tin giáo viên");
+    document.getElementById("password").value = "";
+
+    openModal("Cập nhật thông tin giáo viên");
   } catch (error) {
-    console.error(`Lỗi khi lấy thông tin giáo viên ${id}:`, error);
+    console.error("Lỗi khi load giáo viên:", error);
     alert("Không thể tải thông tin giáo viên.");
   }
 }
 
+/* ============================================================
+   💾 LƯU / CẬP NHẬT GIÁO VIÊN
+=============================================================== */
 async function handleFormSubmit(event) {
   event.preventDefault();
+
   const id = document.getElementById("teacherId").value;
+
   const teacherData = {
     username: document.getElementById("username").value,
     full_name: document.getElementById("full_name").value,
@@ -143,11 +172,11 @@ async function handleFormSubmit(event) {
     date_of_birth: document.getElementById("date_of_birth").value,
     gender: document.getElementById("gender").value,
 
-    // Teacher table
     teacher_code: document.getElementById("teacher_code").value,
     specialization: document.getElementById("specialization").value,
     degree: document.getElementById("degree").value,
     start_date: document.getElementById("start_date").value,
+
     bank_name: document.getElementById("bank_name").value,
     bank_account: document.getElementById("bank_account").value,
     salary: document.getElementById("salary").value,
@@ -155,43 +184,44 @@ async function handleFormSubmit(event) {
   };
 
   const password = document.getElementById("password").value;
-  if (password) {
-    teacherData.password = password;
-  }
+  if (password) teacherData.password = password;
 
   try {
     if (id) {
       await updateTeacher(id, teacherData);
-      alert("Cập nhật giáo viên thành công!");
+      alert("Cập nhật thành công!");
     } else {
       await createTeacher(teacherData);
       alert("Thêm giáo viên thành công!");
     }
+
     closeModal();
     loadTeachers();
   } catch (error) {
-    console.error("Lỗi khi lưu thông tin giáo viên:", error);
-    alert("Lưu thông tin thất bại. " + error.message);
+    console.error("Lỗi khi lưu:", error);
+    alert("Lưu thất bại!");
   }
 }
 
-// function handleResetPassword(id) {
-//   alert("Chức năng reset mật khẩu cho giáo viên: " + id);
-// }
-
+/* ============================================================
+   🗑️ XÓA GIÁO VIÊN
+=============================================================== */
 async function handleDeleteTeacher(id) {
-  if (confirm("Bạn có chắc muốn xóa giáo viên này không?")) {
-    try {
-      await deleteTeacher(id);
-      alert("Đã xóa giáo viên thành công!");
-      loadTeachers();
-    } catch (error) {
-      console.error("Lỗi khi xóa giáo viên:", error);
-      alert("Xóa giáo viên thất bại.");
-    }
+  if (!confirm("Bạn muốn xóa giáo viên này?")) return;
+
+  try {
+    await deleteTeacher(id);
+    alert("Đã xóa thành công!");
+    loadTeachers();
+  } catch (error) {
+    console.error("Lỗi khi xóa:", error);
+    alert("Xóa thất bại.");
   }
 }
 
+/* ============================================================
+🔗 PUBLIC FUNCTIONS
+=============================================================== */
 window.handleEditTeacher = handleEditTeacher;
 window.handleAddTeacher = handleAddTeacher;
 window.handleFormSubmit = handleFormSubmit;

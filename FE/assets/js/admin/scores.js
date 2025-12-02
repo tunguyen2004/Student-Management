@@ -2,6 +2,9 @@ document.addEventListener("DOMContentLoaded", () => {
   loadAdminFilters();
   createEditModal();
 });
+document
+  .getElementById("scoreSearchInput")
+  ?.addEventListener("input", filterScores);
 
 // =========================
 // SELECT DOM
@@ -9,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
 const classSelect = document.getElementById("classSelect");
 const subjectSelect = document.getElementById("subjectSelect");
 const semesterSelect = document.getElementById("semesterSelect");
+let adminScoreData = [];
 
 // Tạo chọn năm học nếu chưa có
 function ensureSchoolYearSelect() {
@@ -77,6 +81,7 @@ async function loadAdminScores() {
     const rows = await fetchFromAPI(`admin/scores?${query.toString()}`);
 
     tbody.innerHTML = "";
+    adminScoreData = rows; // LƯU TẤT CẢ ĐỂ TÌM KIẾM
 
     rows.forEach((st) => {
       const avg =
@@ -252,4 +257,47 @@ function toggleEdit() {
     btn.textContent = "✏️ Sửa điểm";
     table.classList.remove("editing");
   }
+}
+function filterScores() {
+  const keyword = document
+    .getElementById("scoreSearchInput")
+    .value.toLowerCase();
+  const tbody = document.getElementById("adminScoreBody");
+
+  let filtered = adminScoreData.filter(
+    (st) =>
+      st.student_code.toLowerCase().includes(keyword) ||
+      st.full_name.toLowerCase().includes(keyword)
+  );
+
+  renderFilteredScores(filtered);
+}
+function renderFilteredScores(rows) {
+  const tbody = document.getElementById("adminScoreBody");
+  tbody.innerHTML = "";
+
+  rows.forEach((st) => {
+    const avg = (
+      avgOf(st["15ph"]) * 0.3 +
+      avgOf(st["45ph"]) * 0.3 +
+      avgOf(st["thi"]) * 0.4
+    ).toFixed(2);
+
+    tbody.innerHTML += `
+            <tr data-student="${st.student_id}">
+                <td>${st.student_code}</td>
+                <td>${st.full_name}</td>
+                <td>${classSelect.options[classSelect.selectedIndex].text}</td>
+                <td>${
+                  subjectSelect.options[subjectSelect.selectedIndex].text
+                }</td>
+
+                <td>${renderScoreList(st["15ph"], "15ph", st.student_id)}</td>
+                <td>${renderScoreList(st["45ph"], "45ph", st.student_id)}</td>
+                <td>${renderScoreList(st["thi"], "thi", st.student_id)}</td>
+
+                <td>${isNaN(avg) ? "-" : avg}</td>
+            </tr>
+        `;
+  });
 }
