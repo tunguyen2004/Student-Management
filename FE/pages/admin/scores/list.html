@@ -165,6 +165,42 @@
         .score-input.error {
             background: #fee2e2;
         }
+
+        .filter-advanced {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .filter-advanced select,
+        .filter-advanced input {
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            font-size: 15px;
+            transition: 0.2s;
+            outline: none;
+        }
+
+        .filter-advanced input {
+            width: 320px;
+        }
+
+        .filter-advanced select:hover,
+        .filter-advanced input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .filter-advanced select:focus {
+            border-color: #2563eb;
+        }
+
+        .filter-advanced select option {
+            padding: 8px;
+        }
     </style>
 </head>
 
@@ -213,12 +249,38 @@
                 <option value="2">Học kỳ 2</option>
             </select>
             <button onclick="loadAdminScores()">🔍 Xem điểm</button>
-            <button onclick="toggleEdit()">✏️ Sửa điểm</button>
+            <!-- <button onclick="toggleEdit()">✏️ Sửa điểm</button> -->
             <button onclick="exportAdminExcel()">⬇️ Xuất Excel</button>
         </div>
 
-        <input id="scoreSearchInput" type="text" placeholder="Tìm điểm theo mã HS hoặc tên học sinh..."
-            style="padding:10px; width:320px; border-radius:6px; border:1px solid #cbd5e1; margin-bottom:15px;">
+        <div class="filter-advanced">
+            <input id="scoreSearchInput" type="text" placeholder="🔍 Tìm mã HS hoặc tên học sinh...">
+
+            <select id="avgFilter" title="Lọc theo điểm TB">
+                <option value="">-- TB Môn --</option>
+                <option value="9">≥ 9</option>
+                <option value="8">≥ 8</option>
+                <option value="7">≥ 7</option>
+                <option value="6">≥ 6</option>
+                <option value="5">≥ 5</option>
+                <option value="4">≥ 4</option>
+                <option value="3">≥ 3</option>
+            </select>
+
+            <select id="rankFilter" title="Học lực">
+                <option value="">-- Học lực --</option>
+                <option value="gioi">Giỏi</option>
+                <option value="kha">Khá</option>
+                <option value="tb">Trung bình</option>
+                <option value="yeu">Yếu</option>
+            </select>
+
+            <select id="sortFilter" title="Sắp xếp">
+                <option value="">-- Sắp xếp --</option>
+                <option value="asc">↑ Điểm TB tăng dần</option>
+                <option value="desc">↓ Điểm TB giảm dần</option>
+            </select>
+        </div>
 
 
         <table id="adminScoreTable">
@@ -243,6 +305,8 @@
     <script src="/assets/js/auth.js"></script>
     <script src="/assets/js/api.js"></script>
     <script src="/assets/js/admin/scores.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
 </body>
 
 </html>

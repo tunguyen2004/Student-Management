@@ -363,6 +363,30 @@
                 margin: 5% auto;
             }
         }
+
+        .assignment-filters {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .assignment-filters select {
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            font-size: 15px;
+            min-width: 160px;
+            transition: 0.2s;
+            outline: none;
+        }
+
+        .assignment-filters select:hover,
+        .assignment-filters select:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
     </style>
 </head>
 
@@ -401,6 +425,45 @@
             <h2>Phân công giảng dạy</h2>
             <button class="btn-add" onclick="addAssignment()">+ Thêm phân công</button>
         </div>
+        <div class="assignment-filters">
+
+            <select id="filterTeacher" title="lọc theo giáo viên">
+                <option value="">-- Giáo viên --</option>
+            </select>
+
+            <select id="filterClass" title="lọc theo lớp học">
+                <option value="">-- Lớp học --</option>
+            </select>
+
+            <select id="filterSubject" title="lọc theo môn học  ">
+                <option value="">-- Môn học --</option>
+            </select>
+
+            <select id="filterSemester" title="lọc theo học kỳ">
+                <option value="">-- Học kỳ --</option>
+                <option value="1">Học kỳ 1</option>
+                <option value="2">Học kỳ 2</option>
+            </select>
+
+            <select id="filterYear" title="lọc theo năm học">
+                <option value="">-- Năm học --</option>
+                <option value="2024-2025">2024-2025</option>
+                <option value="2025-2026">2025-2026</option>
+            </select>
+
+            <select id="filterDay" title="lọc theo thứ dạy">
+                <option value="">-- Thứ dạy --</option>
+                <option value="thu2">Thứ 2</option>
+                <option value="thu3">Thứ 3</option>
+                <option value="thu4">Thứ 4</option>
+                <option value="thu5">Thứ 5</option>
+                <option value="thu6">Thứ 6</option>
+                <option value="thu7">Thứ 7</option>
+            </select>
+            <button class="btn-add" onclick="exportAssignmentsExcel()"> Xuất Excel</button>
+
+        </div>
+
 
         <!-- BẢNG PHÂN CÔNG GIẢNG DẠY -->
         <table>
@@ -422,10 +485,12 @@
         </table>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="/assets/js/main.js"></script>
     <script src="/assets/js/auth.js"></script>
     <script src="/assets/js/api.js"></script>
     <script src="/assets/js/admin/teaching-assignments.js"></script>
+
 </body>
 
 </html>

@@ -6,6 +6,19 @@ document
   .getElementById("scoreSearchInput")
   ?.addEventListener("input", filterScores);
 
+document
+  .getElementById("scoreSearchInput")
+  ?.addEventListener("input", filterAdvanced);
+document
+  .getElementById("avgFilter")
+  ?.addEventListener("change", filterAdvanced);
+document
+  .getElementById("rankFilter")
+  ?.addEventListener("change", filterAdvanced);
+document
+  .getElementById("sortFilter")
+  ?.addEventListener("change", filterAdvanced);
+
 // =========================
 // SELECT DOM
 // =========================
@@ -13,6 +26,15 @@ const classSelect = document.getElementById("classSelect");
 const subjectSelect = document.getElementById("subjectSelect");
 const semesterSelect = document.getElementById("semesterSelect");
 let adminScoreData = [];
+
+//tính điểm trung bình
+function calcAvg(st) {
+  return (
+    avgOf(st["15ph"]) * 0.3 +
+      avgOf(st["45ph"]) * 0.3 +
+      avgOf(st["thi"]) * 0.4 || 0
+  );
+}
 
 // Tạo chọn năm học nếu chưa có
 function ensureSchoolYearSelect() {
@@ -277,27 +299,108 @@ function renderFilteredScores(rows) {
   tbody.innerHTML = "";
 
   rows.forEach((st) => {
-    const avg = (
-      avgOf(st["15ph"]) * 0.3 +
-      avgOf(st["45ph"]) * 0.3 +
-      avgOf(st["thi"]) * 0.4
-    ).toFixed(2);
+    let avg = isNaN(st.avg) ? "-" : st.avg.toFixed(2);
+    let color = "";
+
+    if (st.avg >= 8) color = "#dcfce7";
+    else if (st.avg >= 6.5) color = "#fef9c3";
+    else if (st.avg >= 5) color = "#fde68a";
+    else color = "#fee2e2";
 
     tbody.innerHTML += `
-            <tr data-student="${st.student_id}">
-                <td>${st.student_code}</td>
-                <td>${st.full_name}</td>
-                <td>${classSelect.options[classSelect.selectedIndex].text}</td>
-                <td>${
-                  subjectSelect.options[subjectSelect.selectedIndex].text
-                }</td>
+        <tr data-student="${st.student_id}">
+            <td>${st.student_code}</td>
+            <td>${st.full_name}</td>
+            <td>${classSelect.options[classSelect.selectedIndex].text}</td>
+            <td>${subjectSelect.options[subjectSelect.selectedIndex].text}</td>
 
-                <td>${renderScoreList(st["15ph"], "15ph", st.student_id)}</td>
-                <td>${renderScoreList(st["45ph"], "45ph", st.student_id)}</td>
-                <td>${renderScoreList(st["thi"], "thi", st.student_id)}</td>
+            <td>${renderScoreList(st["15ph"], "15ph", st.student_id)}</td>
+            <td>${renderScoreList(st["45ph"], "45ph", st.student_id)}</td>
+            <td>${renderScoreList(st["thi"], "thi", st.student_id)}</td>
 
-                <td>${isNaN(avg) ? "-" : avg}</td>
-            </tr>
+            <td style="background:${color}; font-weight:600">${avg}</td>
+        </tr>
         `;
   });
+}
+
+function filterAdvanced() {
+  const keyword = document
+    .getElementById("scoreSearchInput")
+    .value.toLowerCase();
+  const avgFilter = document.getElementById("avgFilter").value;
+  const rankFilter = document.getElementById("rankFilter").value;
+  const sortType = document.getElementById("sortFilter").value;
+
+  // Clone và thêm avg vào từng học sinh
+  let result = adminScoreData.map((st) => ({
+    ...st,
+    avg: calcAvg(st),
+  }));
+
+  // 🔍 Tìm kiếm theo tên/mã
+  if (keyword) {
+    result = result.filter(
+      (st) =>
+        st.student_code.toLowerCase().includes(keyword) ||
+        st.full_name.toLowerCase().includes(keyword)
+    );
+  }
+
+  // 🎯 Lọc theo điểm TB
+  if (avgFilter) {
+    result = result.filter((st) => st.avg >= parseFloat(avgFilter));
+  }
+
+  // 🏅 Lọc theo học lực
+  if (rankFilter) {
+    result = result.filter((st) => {
+      if (rankFilter === "gioi") return st.avg >= 8.0;
+      if (rankFilter === "kha") return st.avg >= 6.5 && st.avg < 8.0;
+      if (rankFilter === "tb") return st.avg >= 5.0 && st.avg < 6.5;
+      if (rankFilter === "yeu") return st.avg < 5.0;
+    });
+  }
+
+  // ↕️ Sắp xếp
+  if (sortType === "asc") result.sort((a, b) => a.avg - b.avg);
+  if (sortType === "desc") result.sort((a, b) => b.avg - a.avg);
+
+  // Render lại
+  renderFilteredScores(result);
+}
+
+function exportAdminExcel() {
+  if (!adminScoreData || adminScoreData.length === 0) {
+    return alert("⚠ Không có dữ liệu để xuất!");
+  }
+
+  const className = classSelect.options[classSelect.selectedIndex].text;
+  const subjectName = subjectSelect.options[subjectSelect.selectedIndex].text;
+  const semester = semesterSelect.value;
+  const schoolYear = document.getElementById("schoolYearSelect").value;
+
+  const rows = adminScoreData.map((st) => {
+    const avg = calcAvg(st).toFixed(2);
+
+    return {
+      "Mã HS": st.student_code,
+      "Họ tên": st.full_name,
+      Lớp: className,
+      Môn: subjectName,
+      "Điểm 15'": st["15ph"]?.join(", ") || "",
+      "Điểm 45'": st["45ph"]?.join(", ") || "",
+      "Điểm Thi": st["thi"]?.join(", ") || "",
+      "Trung bình": avg,
+    };
+  });
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "BangDiem");
+
+  XLSX.writeFile(
+    wb,
+    `Bang_diem_${className}_${subjectName}_HK${semester}_${schoolYear}.xlsx`
+  );
 }

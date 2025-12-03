@@ -2,14 +2,18 @@ document.addEventListener("DOMContentLoaded", () => {
   loadAssignments();
   createModal();
 });
+let allAssignments = [];
 
 async function loadAssignments() {
   try {
     let assignments = await getAssignments();
+    allAssignments = assignments;
     if (assignments && !Array.isArray(assignments)) {
       assignments = [assignments];
     }
+    allAssignments = assignments;
     renderAssignments(assignments);
+    populateFilterOptions();
   } catch (error) {
     console.error("Failed to load assignments:", error);
     const tbody = document.getElementById("assignmentTableBody");
@@ -377,3 +381,162 @@ async function deleteAssignment(id) {
     }
   }
 }
+function applyAssignmentFilter() {
+  const teacherId = document.getElementById("filterTeacher").value;
+  const classId = document.getElementById("filterClass").value;
+  const subjectId = document.getElementById("filterSubject").value;
+  const semester = document.getElementById("filterSemester").value;
+  const year = document.getElementById("filterYear").value;
+  const day = document.getElementById("filterDay").value;
+
+  let filtered = [...allAssignments];
+
+  // Lọc theo giáo viên
+  if (teacherId) {
+    filtered = filtered.filter((a) => a.teacher_id == teacherId);
+  }
+
+  // Lọc theo lớp
+  if (classId) {
+    filtered = filtered.filter((a) => a.class_id == classId);
+  }
+
+  // Lọc theo môn
+  if (subjectId) {
+    filtered = filtered.filter((a) => a.subject_id == subjectId);
+  }
+
+  // Lọc theo học kỳ
+  if (semester) {
+    filtered = filtered.filter((a) => a.semester == semester);
+  }
+
+  // Lọc theo năm học
+  if (year) {
+    filtered = filtered.filter((a) => a.school_year == year);
+  }
+
+  // Lọc theo thứ
+  if (day) {
+    filtered = filtered.filter((a) => {
+      if (!a.teaching_schedule) return false;
+      let sc = {};
+      try {
+        sc = JSON.parse(a.teaching_schedule);
+      } catch {}
+      return sc[day] && sc[day].length > 0;
+    });
+  }
+
+  renderAssignments(filtered);
+}
+function populateFilterOptions() {
+  const teacherSel = document.getElementById("filterTeacher");
+  const classSel = document.getElementById("filterClass");
+  const subjectSel = document.getElementById("filterSubject");
+
+  // Xóa cũ
+  teacherSel.innerHTML = `<option value="">-- Giáo viên --</option>`;
+  classSel.innerHTML = `<option value="">-- Lớp học --</option>`;
+  subjectSel.innerHTML = `<option value="">-- Môn học --</option>`;
+
+  // Teacher unique
+  const teachers = new Map();
+  const classes = new Map();
+  const subjects = new Map();
+
+  allAssignments.forEach((a) => {
+    teachers.set(
+      a.teacher_id,
+      `${a.Teacher.User.full_name} (${a.Teacher.teacher_code})`
+    );
+    classes.set(a.class_id, `${a.Class.class_name} - ${a.Class.class_code}`);
+    subjects.set(
+      a.subject_id,
+      `${a.Subject.subject_name} - ${a.Subject.subject_code}`
+    );
+  });
+
+  teachers.forEach(
+    (name, id) =>
+      (teacherSel.innerHTML += `<option value="${id}">${name}</option>`)
+  );
+  classes.forEach(
+    (name, id) =>
+      (classSel.innerHTML += `<option value="${id}">${name}</option>`)
+  );
+  subjects.forEach(
+    (name, id) =>
+      (subjectSel.innerHTML += `<option value="${id}">${name}</option>`)
+  );
+}
+
+function exportAssignmentsExcel() {
+  if (!allAssignments || allAssignments.length === 0) {
+    return alert("⚠ Không có dữ liệu để xuất!");
+  }
+
+  // Chuẩn hóa dữ liệu để export
+  const rows = allAssignments.map((a) => {
+    const scheduleObj = a.teaching_schedule
+      ? JSON.parse(a.teaching_schedule)
+      : {};
+    const scheduleText = Object.entries(scheduleObj)
+      .map(([day, periods]) => {
+        const dayName = day.charAt(0).toUpperCase() + day.slice(1);
+        return `${dayName}: ${periods.join(", ")}`;
+      })
+      .join(" | ");
+
+    return {
+      ID: a.assignment_id,
+      "Giáo viên": `${a.Teacher.User.full_name} (${a.Teacher.teacher_code})`,
+      Lớp: `${a.Class.class_name} (${a.Class.class_code})`,
+      "Môn học": `${a.Subject.subject_name} (${a.Subject.subject_code})`,
+      "Học kỳ": a.semester,
+      "Năm học": a.school_year,
+      "Lịch dạy": scheduleText || "Chưa có",
+    };
+  });
+
+  // Tạo sheet
+  const ws = XLSX.utils.json_to_sheet(rows);
+
+  // Auto-fit cột
+  const colWidths =
+    rows.length > 0
+      ? Object.keys(rows[0]).map((key) => ({
+          wch:
+            Math.max(key.length, ...rows.map((r) => String(r[key]).length)) + 4,
+        }))
+      : [];
+  ws["!cols"] = colWidths;
+
+  // Tạo workbook
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Assignments");
+
+  // Xuất file
+  XLSX.writeFile(wb, "Danh_sach_phan_con_giang_day.xlsx");
+
+  alert("✅ Xuất file Excel thành công!");
+}
+
+document
+  .getElementById("filterTeacher")
+  .addEventListener("change", applyAssignmentFilter);
+document
+  .getElementById("filterClass")
+  .addEventListener("change", applyAssignmentFilter);
+document
+  .getElementById("filterSubject")
+  .addEventListener("change", applyAssignmentFilter);
+document
+  .getElementById("filterSemester")
+  .addEventListener("change", applyAssignmentFilter);
+document
+  .getElementById("filterYear")
+  .addEventListener("change", applyAssignmentFilter);
+document
+  .getElementById("filterDay")
+  .addEventListener("change", applyAssignmentFilter);

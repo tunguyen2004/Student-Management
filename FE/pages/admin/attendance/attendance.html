@@ -608,7 +608,23 @@
                     Tải dữ liệu
                 </button>
             </div>
+
         </section>
+        <div class="filter-section"
+            style="margin-bottom: 16px;display: flex;justify-content: start; align-items: center;">
+            <div class="filter-item"
+                style="min-width:240px; display: flex; align-items: center; justify-content: flex-start; gap: 10px;">
+                <label for="adminSearchInput">Tìm kiếm học sinh:</label>
+                <input type="text" id="adminSearchInput" placeholder="Nhập mã HS hoặc tên học sinh..."
+                    style="padding:10px;border-radius:8px;border:1.5px solid #cbd5e1;margin-right: 20px;width: 300px;">
+            </div>
+            <button id="exportAttendanceExcelBtn" class="btn-add" style="height:40px;background:#2aca58;">
+                Xuất Excel
+            </button>
+
+
+        </div>
+
 
         <!-- ÁP DỤNG & LƯU TẤT CẢ -->
         <section class="bulk-section" style="margin-bottom: 12px;">
@@ -668,6 +684,7 @@
     </main>
 
 
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="/assets/js/main.js"></script>
     <script src="/assets/js/auth.js"></script>
     <script src="/assets/js/api.js"></script>

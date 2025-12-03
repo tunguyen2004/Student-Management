@@ -421,6 +421,14 @@ function initializeAttendanceManagement() {
   if (saveAllBtn) {
     saveAllBtn.addEventListener("click", saveAllAttendance);
   }
+  const searchInput = document.getElementById("adminSearchInput");
+  if (searchInput) {
+    searchInput.addEventListener("input", filterAttendanceTable);
+  }
+  const exportBtn = document.getElementById("exportAttendanceExcelBtn");
+  if (exportBtn) {
+    exportBtn.addEventListener("click", exportAttendanceExcel);
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -430,3 +438,76 @@ document.addEventListener("DOMContentLoaded", () => {
     console.error("Lỗi khi init attendance admin:", e);
   }
 });
+function filterAttendanceTable() {
+  const search = document
+    .getElementById("adminSearchInput")
+    .value.trim()
+    .toLowerCase();
+  const tbody = document.getElementById("adminAttendanceTableBody");
+
+  if (!tbody) return;
+
+  const rows = tbody.querySelectorAll("tr");
+
+  rows.forEach((row) => {
+    const code = (row.children[1]?.textContent || "").toLowerCase();
+    const name = (row.children[2]?.textContent || "").toLowerCase();
+
+    // Nếu trống => hiện tất cả
+    if (!search) {
+      row.style.display = "";
+      return;
+    }
+
+    if (code.includes(search) || name.includes(search)) {
+      row.style.display = "";
+    } else {
+      row.style.display = "none";
+    }
+  });
+}
+function exportAttendanceExcel() {
+  const tbody = document.getElementById("adminAttendanceTableBody");
+  if (!tbody) return alert("Không có dữ liệu để xuất!");
+
+  const rows = [...tbody.querySelectorAll("tr[data-student-id]")];
+  if (rows.length === 0) {
+    return alert("Không có bản ghi nào để xuất!");
+  }
+
+  // Chuẩn dữ liệu
+  const data = rows.map((row) => {
+    return {
+      Lớp: row.children[0].textContent.trim(),
+      "Mã HS": row.children[1].textContent.trim(),
+      "Họ và tên": row.children[2].textContent.trim(),
+      Ngày: row.children[3].textContent.trim(),
+      Buổi: row.children[4].textContent.trim(),
+      "Trạng thái": labelStatus(
+        row.querySelector(".admin-attendance-status")?.value || ""
+      ),
+      "Ghi chú": row.querySelector(".admin-attendance-notes")?.value || "",
+    };
+  });
+
+  const ws = XLSX.utils.json_to_sheet(data);
+
+  // Auto-fit chiều rộng cột
+  const colWidths = Object.keys(data[0]).map((key) => ({
+    wch: Math.max(key.length, ...data.map((r) => String(r[key]).length)) + 4,
+  }));
+  ws["!cols"] = colWidths;
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Attendance");
+
+  // Lấy date + session để đặt tên file
+  const date =
+    document.getElementById("adminAttendanceDate").value || "unknown";
+  const session = document.getElementById("adminSessionSelect").value || "all";
+
+  const fileName = `diem_danh_${date}_${session}.xlsx`;
+  XLSX.writeFile(wb, fileName);
+
+  alert("Xuất file Excel thành công!");
+}
