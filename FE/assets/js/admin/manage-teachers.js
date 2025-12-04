@@ -115,6 +115,14 @@ function openModal(title) {
   document.getElementById("modalTitle").innerText = title;
   modal.classList.add("show");
 }
+function closeModal() {
+  const modal = document.getElementById("teacherModal");
+
+  if (!modal) return;
+
+  // Xóa class show → modal quay về display:none theo CSS
+  modal.classList.remove("show");
+}
 
 function handleAddTeacher() {
   const form = document.getElementById("teacherForm");
@@ -174,43 +182,85 @@ async function handleFormSubmit(event) {
 
   const id = document.getElementById("teacherId").value;
 
+  // Lấy dữ liệu
+  const full_name = document.getElementById("full_name").value.trim();
+  const username = document.getElementById("username").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const specialization = document.getElementById("specialization").value.trim();
+  const teacher_code = document.getElementById("teacher_code").value.trim();
+  const password = document.getElementById("password").value;
+
+  let salary = document.getElementById("salary").value.replace(/\D/g, "");
+
+  /* ============================================
+      🔥 VALIDATION FORM
+     ============================================ */
+
+  // if (!teacher_code) return alert("❌ Vui lòng nhập Mã giáo viên!");
+  if (!full_name) return alert("❌ Vui lòng nhập Họ tên!");
+  if (!username) return alert("❌ Vui lòng nhập Username!");
+  if (username.length < 4) return alert("❌ Username phải có ít nhất 4 ký tự!");
+
+  if (!email) return alert("❌ Email không được để trống!");
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(email)) return alert("❌ Email không hợp lệ!");
+
+  if (!phone) return alert("❌ Vui lòng nhập số điện thoại!");
+  if (!/^\d{10}$/.test(phone))
+    return alert("❌ Số điện thoại phải đúng 10 số!");
+
+  if (!specialization) return alert("❌ Vui lòng nhập chuyên môn!");
+
+  if (password && password.length < 6)
+    return alert("❌ Mật khẩu phải tối thiểu 6 ký tự!");
+
+  // Validate lương
+  if (salary) {
+    salary = parseInt(salary);
+    if (salary < 1000000 || salary > 100000000) {
+      return alert("❌ Lương phải nằm trong khoảng 1.000.000 - 100.000.000 !");
+    }
+  }
+
+  /* ============================================
+      🔥 TẠO OBJECT ĐỂ GỬI API
+     ============================================ */
+
   const teacherData = {
-    username: document.getElementById("username").value,
-    full_name: document.getElementById("full_name").value,
-    email: document.getElementById("email").value,
-    phone: document.getElementById("phone").value,
+    username,
+    full_name,
+    email,
+    phone,
     address: document.getElementById("address").value,
     date_of_birth: document.getElementById("date_of_birth").value,
     gender: document.getElementById("gender").value,
-
-    teacher_code: document.getElementById("teacher_code").value,
-    specialization: document.getElementById("specialization").value,
+    teacher_code,
+    specialization,
     degree: document.getElementById("degree").value,
     start_date: document.getElementById("start_date").value,
-
     bank_name: document.getElementById("bank_name").value,
     bank_account: document.getElementById("bank_account").value,
-    salary: document.getElementById("salary").value,
+    salary: salary || null,
     notes: document.getElementById("notes").value,
   };
 
-  const password = document.getElementById("password").value;
   if (password) teacherData.password = password;
 
   try {
     if (id) {
       await updateTeacher(id, teacherData);
-      alert("Cập nhật thành công!");
+      alert("✔ Cập nhật giáo viên thành công!");
     } else {
       await createTeacher(teacherData);
-      alert("Thêm giáo viên thành công!");
+      alert("✔ Thêm giáo viên thành công!");
     }
 
     closeModal();
     loadTeachers();
   } catch (error) {
     console.error("Lỗi khi lưu:", error);
-    alert("Lưu thất bại!");
+    alert("❌ Lưu thất bại!");
   }
 }
 
@@ -228,6 +278,17 @@ async function handleDeleteTeacher(id) {
     console.error("Lỗi khi xóa:", error);
     alert("Xóa thất bại.");
   }
+}
+
+const salaryInput = document.getElementById("salary");
+
+if (salaryInput) {
+  salaryInput.addEventListener("input", () => {
+    let value = salaryInput.value.replace(/\D/g, "");
+    if (!value) return (salaryInput.value = "");
+
+    salaryInput.value = new Intl.NumberFormat("vi-VN").format(value);
+  });
 }
 
 /* ============================================================
