@@ -162,7 +162,16 @@ async function handleEditTeacher(id) {
       teacher.Teacher.bank_name || "";
     document.getElementById("bank_account").value =
       teacher.Teacher.bank_account || "";
-    document.getElementById("salary").value = teacher.Teacher.salary || "";
+    let salary = teacher.Teacher.salary;
+
+    if (salary) {
+      salary = parseInt(salary); // bỏ .00
+      document.getElementById("salary").value = new Intl.NumberFormat(
+        "vi-VN"
+      ).format(salary);
+    } else {
+      document.getElementById("salary").value = "";
+    }
     document.getElementById("notes").value = teacher.Teacher.notes || "";
 
     document.getElementById("password").value = "";
@@ -200,7 +209,7 @@ async function handleFormSubmit(event) {
   // if (!teacher_code) return alert("❌ Vui lòng nhập Mã giáo viên!");
   if (!full_name) return alert("❌ Vui lòng nhập Họ tên!");
   if (!username) return alert("❌ Vui lòng nhập Username!");
-  if (username.length < 4) return alert("❌ Username phải có ít nhất 4 ký tự!");
+  // if (username.length < 4) return alert("❌ Username phải có ít nhất 4 ký tự!");
 
   if (!email) return alert("❌ Email không được để trống!");
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
