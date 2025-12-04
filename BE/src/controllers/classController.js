@@ -1,6 +1,11 @@
 // src/controllers/classController.js
 const { Class, Teacher, User, Student } = require("../models");
 
+async function generateClassCode(grade) {
+  const count = await Class.count({ where: { grade } });
+  return `${grade}A${count + 1}`;
+}
+
 // @desc    Get all classes
 // @route   GET /api/classes
 // @access  Admin
@@ -76,27 +81,8 @@ exports.getClassById = async (req, res) => {
 // @route   POST /api/classes
 // @access  Admin
 exports.createClass = async (req, res) => {
-  const {
-    class_code,
-    class_name,
-    grade,
-    school_year,
-    homeroom_teacher_id,
-    room_number,
-    max_students,
-    status,
-  } = req.body;
-
-  // Validation
-  if (!class_code || !class_name || !grade || !school_year) {
-    return res.status(400).json({
-      msg: "Please provide class_code, class_name, grade, and school_year",
-    });
-  }
-
   try {
-    const newClass = await Class.create({
-      class_code,
+    const {
       class_name,
       grade,
       school_year,
@@ -104,10 +90,32 @@ exports.createClass = async (req, res) => {
       room_number,
       max_students,
       status,
+    } = req.body;
+
+    if (!class_name || !grade || !school_year) {
+      return res.status(400).json({
+        msg: "Vui lòng nhập class_name, grade, school_year",
+      });
+    }
+
+    // 🎯 Tự sinh mã lớp
+    const class_code = await generateClassCode(grade);
+
+    const newClass = await Class.create({
+      class_code,
+      class_name,
+      grade,
+      school_year,
+      homeroom_teacher_id: homeroom_teacher_id || null,
+      room_number,
+      max_students,
+      status: status || "active",
+      current_students: 0,
     });
+
     res.status(201).json(newClass);
   } catch (err) {
-    console.error(err.message);
+    console.error(err);
     res.status(500).send("Server Error");
   }
 };

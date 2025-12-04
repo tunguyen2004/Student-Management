@@ -128,7 +128,8 @@ async function handleEditClass(id) {
     const form = document.getElementById("classForm");
     if (form) {
       document.getElementById("classId").value = cls.id;
-      document.getElementById("class_code").value = cls.class_code;
+      const codeInput = document.getElementById("class_code");
+      if (codeInput) codeInput.value = cls.class_code;
       document.getElementById("class_name").value = cls.class_name;
       document.getElementById("grade").value = cls.grade;
       document.getElementById("school_year").value = cls.school_year;
@@ -157,16 +158,13 @@ async function handleFormSubmit(event) {
   const maxStudents = document.getElementById("max_students").value;
 
   const classData = {
-    class_code: document.getElementById("class_code").value,
     class_name: document.getElementById("class_name").value,
     grade: document.getElementById("grade").value,
     school_year: document.getElementById("school_year").value,
     room_number: document.getElementById("room_number").value,
-    max_students: maxStudents ? parseInt(maxStudents, 10) : null,
+    max_students: maxStudents ? parseInt(maxStudents) : null,
     status: document.getElementById("status").value,
-    homeroom_teacher_id: homeroomTeacherId
-      ? parseInt(homeroomTeacherId, 10)
-      : null,
+    homeroom_teacher_id: homeroomTeacherId ? parseInt(homeroomTeacherId) : null,
   };
 
   try {
