@@ -99,7 +99,7 @@ async function loadTeachersForDropdown() {
       if (Array.isArray(teacherList)) {
         teacherList.forEach((teacher) => {
           const option = document.createElement("option");
-          option.value = teacher.id;
+          option.value = teacher.Teacher.id;
           option.textContent = teacher.full_name;
           teacherSelect.appendChild(option);
         });
