@@ -158,6 +158,22 @@
         .actions button:hover {
             text-decoration: underline;
         }
+
+        /* ẨN mặc định */
+        #teacherModal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 9999;
+        }
+
+        /* Khi được mở */
+        #teacherModal.show {
+            display: flex;
+        }
     </style>
 </head>
 
@@ -211,6 +227,7 @@
         <table>
             <thead>
                 <tr>
+                    <th>STT</th>
                     <th>Mã GV</th>
                     <th>Họ tên</th>
                     <th>Email</th>
@@ -231,21 +248,25 @@
     <script src="/assets/js/main.js"></script>
     <script src="/assets/js/auth.js"></script>
     <script src="/assets/js/api.js"></script>
-    <!-- <script src="/assets/js/admin/manage-teachers.js"></script> -->
     <script src="/assets/js/include.js"></script>
     <script>
         includeHTML("modal-container", "/components/modal.html", () => {
+            console.log("Modal loaded!");
+
+            // Sau khi modal có mặt trong DOM → load JS quản lý giáo viên
             const script = document.createElement("script");
             script.src = "/assets/js/admin/manage-teachers.js";
 
             script.onload = () => {
-                console.log("manage-teachers.js loaded ✅");
-                initializeTeacherManagement(); // ✅ gọi ở đây để load danh sách
+                console.log("manage-teachers.js loaded and ready!");
+                initializeTeacherManagement();
             };
 
             document.body.appendChild(script);
         });
     </script>
+
+
 </body>
 
 </html>

@@ -70,7 +70,10 @@ module.exports = (sequelize, DataTypes) => {
   Student.associate = (models) => {
     Student.belongsTo(models.Class, { foreignKey: "class_id" });
     // Student.belongsTo(models.User, { foreignKey: "user_id" }); //  ✅ THÊM DÒNG NÀY
-    Student.hasMany(models.Attendance, { foreignKey: "student_id" });
+    Student.hasMany(models.Attendance, {
+      foreignKey: "student_id",
+      onDelete: "CASCADE",
+    });
   };
 
   return Student;

@@ -1,13 +1,31 @@
 // ===================== HELPER =========================
-function setTeacherReportMessage(text, type = "info") {
+let teacherReportTimeout = null;
+
+function setTeacherReportMessage(text, type = "info", duration = 2500) {
   const box = document.getElementById("teacherReportMessage");
   if (!box) return;
 
-  box.className = "message show";
+  // Reset timeout cũ (nếu thông báo trước chưa tắt kịp)
+  if (teacherReportTimeout) clearTimeout(teacherReportTimeout);
+
+  // Reset class
+  box.className = "message";
+
+  // Thêm text
   box.textContent = text;
 
+  // Thêm class loại thông báo
   if (type === "success") box.classList.add("success");
   else if (type === "error") box.classList.add("error");
+  else box.classList.add("info");
+
+  // Hiển thị box
+  box.classList.add("show");
+
+  // Tự động ẩn sau duration ms
+  teacherReportTimeout = setTimeout(() => {
+    box.classList.remove("show");
+  }, duration);
 }
 
 // ===================== FILL SCHOOL YEAR =========================

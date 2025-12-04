@@ -3,10 +3,19 @@
 // =========================================
 
 // ================== COMMON MESSAGE ==================
-function setAdminMessage(id, text, type = "info") {
+let adminMessageTimeout = null;
+
+function setAdminMessage(id, text, type = "info", duration = 3000) {
   const box = document.getElementById(id);
   if (!box) return;
 
+  // Xóa timeout cũ để tránh bị chồng nhiều lần
+  if (adminMessageTimeout) {
+    clearTimeout(adminMessageTimeout);
+    adminMessageTimeout = null;
+  }
+
+  // ⛔ Nếu không có text → xóa thông báo
   if (!text) {
     box.style.display = "none";
     box.textContent = "";
@@ -14,9 +23,23 @@ function setAdminMessage(id, text, type = "info") {
     return;
   }
 
+  // Hiện thông báo
   box.style.display = "block";
   box.textContent = text;
   box.className = `message ${type}`; // success | error | info
+
+  // ⏳ Auto hide sau duration ms
+  adminMessageTimeout = setTimeout(() => {
+    box.style.opacity = "0";
+    box.style.transition = "opacity .4s";
+
+    setTimeout(() => {
+      box.style.display = "none";
+      box.textContent = "";
+      box.className = "message";
+      box.style.opacity = "1";
+    }, 400);
+  }, duration);
 }
 
 // ================== FORMAT HELPERS ==================
@@ -362,4 +385,156 @@ document.addEventListener("DOMContentLoaded", () => {
   document
     .getElementById("loadSubjectBtn")
     .addEventListener("click", loadAdminSubjectReport);
+  document
+    .getElementById("exportClassReportBtn")
+    .addEventListener("click", exportClassReportExcel);
+
+  document
+    .getElementById("exportSubjectReportBtn")
+    .addEventListener("click", exportSubjectReportExcel);
 });
+/* ============================================
+   📤 XUẤT BÁO CÁO LỚP RA EXCEL
+============================================ */
+function exportClassReportExcel() {
+  const classSelect = document.getElementById("adminClassSelect");
+  const yearSelect = document.getElementById("adminClassYear");
+
+  if (!classSelect.value || !yearSelect.value) {
+    setAdminMessage(
+      "adminReportMessage",
+      "Hãy chọn lớp và năm học trước!",
+      "error"
+    );
+    return;
+  }
+
+  const className = classSelect.options[classSelect.selectedIndex].text;
+  const schoolYear = yearSelect.value;
+
+  // ----- Lấy nội dung tổng quan -----
+  const summaryText = document.getElementById("classSummaryContent").innerText;
+
+  // ----- Lấy bảng môn học -----
+  const subjects = [...document.querySelectorAll("#classSubjectBody tr")].map(
+    (row) => {
+      const cols = row.querySelectorAll("td");
+      return {
+        "Môn học": cols[0]?.innerText || "",
+        TB: cols[1]?.innerText || "",
+        "Cao nhất": cols[2]?.innerText || "",
+        "Thấp nhất": cols[3]?.innerText || "",
+        "Tỉ lệ qua": cols[4]?.innerText || "",
+      };
+    }
+  );
+
+  // ----- Lấy bảng học sinh -----
+  const students = [...document.querySelectorAll("#classStudentBody tr")].map(
+    (row) => {
+      const cols = row.querySelectorAll("td");
+      return {
+        "Mã HS": cols[0]?.innerText || "",
+        "Họ tên": cols[1]?.innerText || "",
+        "Điểm TB": cols[2]?.innerText || "",
+        "Xếp loại": cols[3]?.innerText || "",
+        "Môn yếu nhất": cols[4]?.innerText || "",
+      };
+    }
+  );
+
+  // Tạo workbook
+  const wb = XLSX.utils.book_new();
+
+  // ===== SHEET 1: TÓM TẮT =====
+  const wsSummary = XLSX.utils.aoa_to_sheet([
+    ["BÁO CÁO LỚP"],
+    ["Lớp:", className],
+    ["Năm học:", schoolYear],
+    [],
+    ["TÓM TẮT"],
+    [summaryText],
+  ]);
+  XLSX.utils.book_append_sheet(wb, wsSummary, "Tong quan");
+
+  // ===== SHEET 2: THỐNG KÊ MÔN =====
+  const wsSubject = XLSX.utils.json_to_sheet(subjects);
+  XLSX.utils.book_append_sheet(wb, wsSubject, "Thong ke mon");
+
+  // ===== SHEET 3: HỌC SINH =====
+  const wsStudents = XLSX.utils.json_to_sheet(students);
+  XLSX.utils.book_append_sheet(wb, wsStudents, "Danh sach HS");
+
+  // Xuất file
+  XLSX.writeFile(wb, `BaoCao_Lop_${className}_${schoolYear}.xlsx`);
+}
+
+/* ============================================
+   📤 XUẤT BÁO CÁO MÔN RA EXCEL
+============================================ */
+function exportSubjectReportExcel() {
+  const subjectSelect = document.getElementById("adminSubjectSelect");
+  const yearSelect = document.getElementById("adminSubjectYear");
+
+  if (!subjectSelect.value || !yearSelect.value) {
+    setAdminMessage("adminReportMessage", "Hãy chọn môn và năm học!", "error");
+    return;
+  }
+
+  const subjectName = subjectSelect.options[subjectSelect.selectedIndex].text;
+  const schoolYear = yearSelect.value;
+
+  const summaryText = document.getElementById(
+    "subjectSummaryContent"
+  ).innerText;
+
+  const classRows = [...document.querySelectorAll("#subjectClassBody tr")].map(
+    (row) => {
+      const c = row.querySelectorAll("td");
+      return {
+        Lớp: c[0]?.innerText || "",
+        "Điểm TB": c[1]?.innerText || "",
+        "Sĩ số": c[2]?.innerText || "",
+        "Tỉ lệ qua": c[3]?.innerText || "",
+      };
+    }
+  );
+
+  const studentRows = [
+    ...document.querySelectorAll("#subjectStudentBody tr"),
+  ].map((row) => {
+    const c = row.querySelectorAll("td");
+    return {
+      "Mã HS": c[0]?.innerText || "",
+      "Họ tên": c[1]?.innerText || "",
+      TB: c[2]?.innerText || "",
+      "Xếp loại": c[3]?.innerText || "",
+    };
+  });
+
+  const wb = XLSX.utils.book_new();
+
+  const wsSummary = XLSX.utils.aoa_to_sheet([
+    ["BÁO CÁO MÔN HỌC"],
+    ["Môn:", subjectName],
+    ["Năm học:", schoolYear],
+    [],
+    ["TÓM TẮT"],
+    [summaryText],
+  ]);
+  XLSX.utils.book_append_sheet(wb, wsSummary, "Tong quan");
+
+  XLSX.utils.book_append_sheet(
+    wb,
+    XLSX.utils.json_to_sheet(classRows),
+    "Theo lop"
+  );
+
+  XLSX.utils.book_append_sheet(
+    wb,
+    XLSX.utils.json_to_sheet(studentRows),
+    "Theo hoc sinh"
+  );
+
+  XLSX.writeFile(wb, `BaoCao_Mon_${subjectName}_${schoolYear}.xlsx`);
+}

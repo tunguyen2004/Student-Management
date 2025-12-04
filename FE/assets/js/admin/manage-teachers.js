@@ -51,6 +51,7 @@ function renderTeachers(teachers) {
   teachers.forEach((t) => {
     table.innerHTML += `
             <tr>
+                <td>${teachers.indexOf(t) + 1}</td>
                 <td>${t.Teacher.teacher_code}</td>
                 <td>${t.full_name}</td>
                 <td>${t.email}</td>
@@ -58,7 +59,9 @@ function renderTeachers(teachers) {
                 <td>${t.Teacher.specialization}</td>
                 <td class="actions">
                     <button onclick="handleEditTeacher(${t.id})">✏️ Sửa</button>
-                    <button onclick="handleDeleteTeacher(${t.id})">🗑️ Xóa</button>
+                    <button onclick="handleDeleteTeacher(${
+                      t.id
+                    })">🗑️ Xóa</button>
                 </td>
             </tr>
         `;
@@ -105,6 +108,14 @@ function applyFilters() {
 /* ============================================================
    ➕ THÊM GIÁO VIÊN
 =============================================================== */
+function openModal(title) {
+  const modal = document.getElementById("teacherModal");
+  if (!modal) return;
+
+  document.getElementById("modalTitle").innerText = title;
+  modal.classList.add("show");
+}
+
 function handleAddTeacher() {
   const form = document.getElementById("teacherForm");
   if (form) {
@@ -227,3 +238,4 @@ window.handleAddTeacher = handleAddTeacher;
 window.handleFormSubmit = handleFormSubmit;
 window.openModal = openModal;
 window.closeModal = closeModal;
+console.log("👉 teacherForm =", document.getElementById("teacherForm"));

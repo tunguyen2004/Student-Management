@@ -33,6 +33,8 @@ module.exports = async function (req, res, next) {
       role: user.role,
       teacher_id: user.Teacher ? user.Teacher.id : null, // ✅ QUAN TRỌNG
     };
+    console.log("🔥 AUTH CHECK:", req.user);
+    console.log("AUTH MIDDLEWARE → req.user =", req.user);
 
     next();
   } catch (err) {

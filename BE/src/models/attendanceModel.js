@@ -54,14 +54,15 @@ module.exports = (sequelize, DataTypes) => {
 
   // Nếu em muốn liên kết với Student, Class... có thể thêm (tùy tên model bên em):
   Attendance.associate = (models) => {
-    // tên model có thể là Student / Class hoặc Students / Classes
-    // chỉnh lại cho đúng nếu khác
-    if (models.Student) {
-      Attendance.belongsTo(models.Student, { foreignKey: "student_id" });
-    }
-    if (models.Class) {
-      Attendance.belongsTo(models.Class, { foreignKey: "class_id" });
-    }
+    Attendance.belongsTo(models.Student, {
+      foreignKey: "student_id",
+      onDelete: "CASCADE",
+    });
+
+    Attendance.belongsTo(models.Class, {
+      foreignKey: "class_id",
+      onDelete: "SET NULL",
+    });
   };
 
   return Attendance;

@@ -1,9 +1,17 @@
 // src: assets/js/teacher/subject-statistics.js
 // Thống kê nhanh môn học (TB, top/bottom,...)
 // ================== HELPER: THÔNG BÁO ==================
+let teacherSubjectMsgTimer = null;
+
 function setTeacherSubjectMessage(text, type = "info") {
   const box = document.getElementById("teacherSubjectMessage");
   if (!box) return;
+
+  // Xóa timer cũ nếu đang chạy
+  if (teacherSubjectMsgTimer) {
+    clearTimeout(teacherSubjectMsgTimer);
+    teacherSubjectMsgTimer = null;
+  }
 
   if (!text) {
     box.style.display = "none";
@@ -19,6 +27,20 @@ function setTeacherSubjectMessage(text, type = "info") {
   if (type === "success") box.classList.add("success");
   else if (type === "error") box.classList.add("error");
   else box.classList.add("info");
+
+  // ⏳ Tự ẩn sau 3 giây
+  teacherSubjectMsgTimer = setTimeout(() => {
+    box.style.opacity = "1";
+    box.style.transition = "opacity 0.6s";
+
+    box.style.opacity = "0";
+
+    setTimeout(() => {
+      box.style.display = "none";
+      box.className = "message";
+      box.style.opacity = "1";
+    }, 600);
+  }, 3000);
 }
 
 // Format điểm: 2 chữ số thập phân

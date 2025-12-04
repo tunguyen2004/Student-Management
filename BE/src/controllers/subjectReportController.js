@@ -205,7 +205,7 @@ exports.getSubjectStudentStatsAdmin = async (req, res) => {
  */
 exports.getSubjectSummaryTeacher = async (req, res) => {
   try {
-    const teacherId = req.user?.id;
+    const teacherId = req.user?.teacher_id;
     const subjectId = parseInt(req.params.subjectId, 10);
     const semester = req.query.semester || null;
     const schoolYear = req.query.school_year || null;
@@ -272,7 +272,7 @@ exports.getSubjectSummaryTeacher = async (req, res) => {
  */
 exports.getSubjectClassStatsTeacher = async (req, res) => {
   try {
-    const teacherId = req.user?.id;
+    const teacherId = req.user?.teacher_id;
     const subjectId = parseInt(req.params.subjectId, 10);
     const semester = req.query.semester || null;
     const schoolYear = req.query.school_year || null;
@@ -324,11 +324,9 @@ exports.getSubjectClassStatsTeacher = async (req, res) => {
     return res.json({ data: rows });
   } catch (err) {
     console.error("getSubjectClassStatsTeacher error:", err);
-    return res
-      .status(500)
-      .json({
-        message: "Lỗi server khi lấy thống kê lớp theo môn (giáo viên)",
-      });
+    return res.status(500).json({
+      message: "Lỗi server khi lấy thống kê lớp theo môn (giáo viên)",
+    });
   }
 };
 
@@ -338,7 +336,7 @@ exports.getSubjectClassStatsTeacher = async (req, res) => {
  */
 exports.getSubjectStudentStatsTeacher = async (req, res) => {
   try {
-    const teacherId = req.user?.id;
+    const teacherId = req.user?.teacher_id;
     const subjectId = parseInt(req.params.subjectId, 10);
     const semester = req.query.semester || null;
     const schoolYear = req.query.school_year || null;

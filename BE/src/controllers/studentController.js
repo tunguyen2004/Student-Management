@@ -1,3 +1,4 @@
+// src/controllers/studentController.js
 const { Student, Class } = require("../models");
 const { Op } = require("sequelize");
 

@@ -1,4 +1,5 @@
-const { Class, Teacher, User } = require("../models");
+// src/controllers/classController.js
+const { Class, Teacher, User, Student } = require("../models");
 
 // @desc    Get all classes
 // @route   GET /api/classes
@@ -11,12 +12,11 @@ exports.getAllClasses = async (req, res) => {
         {
           model: Teacher,
           attributes: ["id", "teacher_code"],
-          include: [
-            {
-              model: User,
-              attributes: ["full_name"],
-            },
-          ],
+          include: [{ model: User, attributes: ["full_name"] }],
+        },
+        {
+          model: Student,
+          attributes: ["id"], // chỉ cần đếm số lượng
         },
       ],
       order: [
@@ -25,9 +25,18 @@ exports.getAllClasses = async (req, res) => {
         ["class_name", "ASC"],
       ],
     });
-    res.json(classes);
+
+    // 🎯 Convert to JSON + gắn thêm student_count
+    const result = classes.map((cls) => {
+      const data = cls.toJSON();
+      data.student_count = data.Students ? data.Students.length : 0;
+      delete data.Students;
+      return data;
+    });
+
+    res.json(result);
   } catch (err) {
-    console.error(err.message);
+    console.error(err);
     res.status(500).send("Server Error");
   }
 };

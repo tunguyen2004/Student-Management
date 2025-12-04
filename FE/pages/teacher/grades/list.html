@@ -165,6 +165,21 @@
         .score-input.error {
             background: #fee2e2;
         }
+
+        .btn-add {
+            background: #2563eb;
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 15px;
+        }
+
+        .btn-add:hover {
+            background: #1d4ed8;
+        }
     </style>
 </head>
 
@@ -222,17 +237,17 @@
             </select>
 
             <!-- NĂM HỌC -->
-            <select id="schoolYearSelect" title="Chọn năm học">
+            <!-- <select id="schoolYearSelect" title="Chọn năm học">
                 <option value="">-- Năm học --</option>
-            </select>
+            </select> -->
 
             <!-- Nút hành động -->
-            <button type="button" onclick="loadStudentsAndScores()">
-                ✏️ Nhập điểm
+            <button class="btn-add" type="button" onclick="loadStudentsAndScores()">
+                tải danh sách
             </button>
-            <button type="button" onclick="viewScores()">
+            <!-- <button type="button" onclick="viewScores()">
                 👁 Xem điểm
-            </button>
+            </button> -->
         </div>
 
         <!-- TABLE -->

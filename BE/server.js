@@ -1,3 +1,4 @@
+// server.js
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -25,8 +26,8 @@ app.use("/api/assignments", require("./src/routes/assignmentRoutes"));
 app.use("/api/attendance", require("./src/routes/attendanceRoutes"));
 app.use("/api/scores", require("./src/routes/scoreRoutes"));
 app.use("/api/admin/scores", require("./src/routes/adminRoute"));
-app.use("/api/reports", require("./src/routes/reportRoutes"));
 app.use("/api/reports", require("./src/routes/subjectReportRoutes"));
+app.use("/api/reports", require("./src/routes/reportRoutes"));
 
 const PORT = process.env.PORT || 5000;
 

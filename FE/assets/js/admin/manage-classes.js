@@ -40,33 +40,39 @@ async function loadClasses() {
 
     const rowsHtml = classList
       .map((cls) => {
+        // 🔥 Lấy tên giáo viên chủ nhiệm đúng chuẩn
         const teacherName =
-          cls.teacher && cls.teacher.user
-            ? cls.teacher.user.full_name
+          cls.Teacher && cls.Teacher.User
+            ? cls.Teacher.User.full_name
             : "Chưa có";
+
+        // 🔥 Trạng thái
         const statusText =
           cls.status === "active" ? "Hoạt động" : "Không hoạt động";
+
         return `
-                <tr>
-                    <td>${cls.class_code}</td>
-                    <td>${cls.class_name}</td>
-                    <td>${cls.grade}</td>
-                    <td>${cls.school_year}</td>
-                    <td>${cls.room_number || "N/A"}</td>
-                    <td>${cls.current_students}</td>
-                    <td>${cls.max_students || "N/A"}</td>
-                    <td>${statusText}</td>
-                    <td>${teacherName}</td>
-                    <td class="actions">
-                        <button onclick="handleEditClass(${
-                          cls.id
-                        })">✏️ Sửa</button>
-                        <button onclick="handleDeleteClass(${
-                          cls.id
-                        })">🗑️ Xóa</button>
-                    </td>
-                </tr>
-            `;
+        <tr>
+            <td>${cls.class_code}</td>
+            <td>${cls.class_name}</td>
+            <td>${cls.grade}</td>
+            <td>${cls.school_year}</td>
+            <td>${cls.room_number || "N/A"}</td>
+
+            <!-- 🔥 đảm bảo luôn hiện đúng sĩ số -->
+            <td>${cls.student_count ?? 0}</td>
+
+            <td>${cls.max_students || "N/A"}</td>
+            <td>${statusText}</td>
+
+            <!-- 🔥 hiện đúng giáo viên -->
+            <td>${teacherName}</td>
+
+            <td class="actions">
+                <button onclick="handleEditClass(${cls.id})">✏️ Sửa</button>
+                <button onclick="handleDeleteClass(${cls.id})">🗑️ Xóa</button>
+            </td>
+        </tr>
+    `;
       })
       .join("");
 

@@ -61,6 +61,7 @@ function renderStudents() {
     .map(
       (student) => `
             <tr>
+                    <td>${allStudents.indexOf(student) + 1}</td>
                     <td>${student.student_code}</td>
                     <td>${student.full_name}</td>
                     <td>${new Date(

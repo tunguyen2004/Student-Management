@@ -298,6 +298,15 @@
                 width: 100%;
             }
         }
+
+        .message {
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .message.show {
+            opacity: 1;
+        }
     </style>
 </head>
 
@@ -352,6 +361,8 @@
                 <button id="teacherLoadReportBtn" class="btn-add">Tải thống kê</button>
             </div>
         </div>
+        <div id="teacherReportMessage" class="message"></div>
+
 
         <!-- Summary -->
         <div class="card" id="teacherSummaryBox" style="display:none;">
@@ -393,7 +404,6 @@
             </table>
         </div>
 
-        <div id="teacherReportMessage" class="message"></div>
 
     </main>
 
