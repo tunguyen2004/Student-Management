@@ -28,6 +28,7 @@ app.use("/api/scores", require("./src/routes/scoreRoutes"));
 app.use("/api/admin/scores", require("./src/routes/adminRoute"));
 app.use("/api/reports", require("./src/routes/subjectReportRoutes"));
 app.use("/api/reports", require("./src/routes/reportRoutes"));
+app.use("/api/teacher", require("./src/routes/dashboardTeacherRoutes"));
 
 const PORT = process.env.PORT || 5000;
 

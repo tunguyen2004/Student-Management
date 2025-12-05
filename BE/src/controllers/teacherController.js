@@ -1,3 +1,4 @@
+// src/controllers/teacherController.js
 const {
   User,
   Teacher,
