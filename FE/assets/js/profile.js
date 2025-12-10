@@ -68,11 +68,43 @@ function formatDate(date) {
 async function saveProfileUpdate() {
   if (!PROFILE_DATA) return alert("Không có dữ liệu hồ sơ!");
 
+  const full_name = document.getElementById("editFullName").value.trim();
+  const phone = document.getElementById("editPhone").value.trim();
+  const email = document.getElementById("editEmail").value.trim();
+  const dob = document.getElementById("editDob").value.trim();
+  const address = document.getElementById("editAddress").value.trim();
+
+  // === KIỂM TRA KHÔNG ĐỂ TRỐNG ===
+  if (!full_name || !phone || !email || !dob || !address) {
+    return alert("❌ Vui lòng nhập đầy đủ tất cả các trường!");
+  }
+
+  // === KIỂM TRA EMAIL ===
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return alert("❌ Email không hợp lệ! Vui lòng kiểm tra lại.");
+  }
+
+  // === KIỂM TRA SỐ ĐIỆN THOẠI VIỆT NAM ===
+  const phoneRegex = /^(0[3|5|7|8|9])[0-9]{8}$/;
+  if (!phoneRegex.test(phone)) {
+    return alert("❌ Số điện thoại không hợp lệ! Phải bao gồm 10 số.");
+  }
+
+  // === KIỂM TRA NGÀY SINH (không được lớn hơn hiện tại) ===
+  const today = new Date();
+  const birthday = new Date(dob);
+
+  if (birthday > today) {
+    return alert("❌ Ngày sinh không hợp lệ! Không thể lớn hơn ngày hiện tại.");
+  }
+
   const payload = {
-    full_name: document.getElementById("editFullName").value.trim(),
-    phone: document.getElementById("editPhone").value.trim(),
-    email: document.getElementById("editEmail").value.trim(),
-    address: document.getElementById("editAddress").value.trim(),
+    full_name,
+    phone,
+    email,
+    date_of_birth: dob,
+    address,
   };
 
   // Nếu là giáo viên thì thêm trường giáo viên
@@ -91,10 +123,8 @@ async function saveProfileUpdate() {
 
     if (!res) return alert("Cập nhật thất bại!");
 
-    alert("Cập nhật thông tin thành công!");
+    alert("✅ Cập nhật thông tin thành công!");
     closeEditModal();
-
-    // reload lại dữ liệu profile
     location.reload();
   } catch (err) {
     console.error("Lỗi cập nhật:", err);
@@ -109,6 +139,7 @@ function openEditModal() {
   if (!PROFILE_DATA) return;
 
   document.getElementById("editFullName").value = PROFILE_DATA.full_name || "";
+  document.getElementById("editDob").value = PROFILE_DATA.date_of_birth || "";
   document.getElementById("editPhone").value = PROFILE_DATA.phone || "";
   document.getElementById("editEmail").value = PROFILE_DATA.email || "";
   document.getElementById("editAddress").value = PROFILE_DATA.address || "";

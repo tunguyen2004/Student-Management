@@ -1,3 +1,4 @@
+// assets/js/api.js
 const API_URL = "http://localhost:5000/api";
 async function fetchFromAPI(endpoint, options = {}) {
   const TOKEN = localStorage.getItem("token");
@@ -22,7 +23,14 @@ async function fetchFromAPI(endpoint, options = {}) {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || "Something went wrong");
+
+      const error = new Error(
+        errorData.msg || errorData.message || "API Error"
+      );
+      error.data = errorData;
+      error.status = response.status;
+
+      throw error;
     }
 
     return response.json();

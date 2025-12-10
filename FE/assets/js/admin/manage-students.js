@@ -61,7 +61,7 @@ function renderStudents() {
     .map(
       (student) => `
             <tr>
-                    <td>${allStudents.indexOf(student) + 1}</td>
+                    <td>${filteredStudents.indexOf(student) + 1}</td>
                     <td>${student.student_code}</td>
                     <td>${student.full_name}</td>
                     <td>${new Date(
@@ -241,9 +241,31 @@ async function handleFormSubmit(event) {
 
 async function handleFormSubmit(event) {
   event.preventDefault();
+
   const id = document.getElementById("studentId").value;
   const classId = document.getElementById("class_id").value;
 
+  const phone = document.getElementById("phone").value.trim();
+  const parentPhone = document.getElementById("parent_phone").value.trim();
+
+  // ============================
+  // ⭐ VALIDATE SỐ ĐIỆN THOẠI
+  // ============================
+  const phoneRegex = /^[0-9]{10}$/;
+
+  if (phone && !phoneRegex.test(phone)) {
+    alert("Số điện thoại học sinh phải gồm đúng 10 chữ số!");
+    return;
+  }
+
+  if (parentPhone && !phoneRegex.test(parentPhone)) {
+    alert("Số điện thoại phụ huynh phải gồm đúng 10 chữ số!");
+    return;
+  }
+
+  // ============================
+  // 🔥 DATA GỬI LÊN SERVER
+  // ============================
   const studentData = {
     student_code: document.getElementById("student_code").value,
     full_name: document.getElementById("full_name").value,
@@ -251,10 +273,10 @@ async function handleFormSubmit(event) {
     gender: document.getElementById("gender").value,
     class_id: classId ? parseInt(classId, 10) : null,
     email: document.getElementById("email").value,
-    phone: document.getElementById("phone").value,
+    phone,
     address: document.getElementById("address").value,
     parent_name: document.getElementById("parent_name").value,
-    parent_phone: document.getElementById("parent_phone").value,
+    parent_phone: parentPhone,
     enrollment_date: document.getElementById("enrollment_date").value,
     status: document.getElementById("status").value,
     notes: document.getElementById("notes").value,
@@ -268,6 +290,7 @@ async function handleFormSubmit(event) {
       await createStudent(studentData);
       alert("Thêm học sinh thành công!");
     }
+
     closeModal("studentModal");
     loadStudents();
   } catch (error) {

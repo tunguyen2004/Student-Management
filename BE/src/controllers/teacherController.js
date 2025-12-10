@@ -90,6 +90,11 @@ exports.createTeacher = async (req, res) => {
         transaction: t,
       });
       if (userExists) throw new Error("Username already exists");
+      const emailExists = await User.findOne({
+        where: { email },
+        transaction: t,
+      });
+      if (emailExists) throw new Error("EMAIL_EXISTS");
 
       // ✅ Tự sinh teacher_code theo năm
       const year = start_date
@@ -161,7 +166,16 @@ exports.createTeacher = async (req, res) => {
     return res.status(201).json(result);
   } catch (err) {
     console.error(err.message);
-    res.status(500).json({ msg: err.message || "Server Error" });
+
+    if (err.message === "USERNAME_EXISTS") {
+      return res.status(400).json({ msg: "Tên đăng nhập đã tồn tại!" });
+    }
+
+    if (err.message === "EMAIL_EXISTS") {
+      return res.status(400).json({ msg: "Email đã được sử dụng!" });
+    }
+
+    return res.status(500).json({ msg: "Server Error" });
   }
 };
 
@@ -222,6 +236,15 @@ exports.updateTeacher = async (req, res) => {
       });
 
       if (!user) throw new Error("Teacher not found");
+      // Kiểm tra email trùng (ngoại trừ chính user này)
+      if (email) {
+        const emailUsed = await User.findOne({
+          where: { email, id: { [Op.ne]: id } },
+          transaction: t,
+        });
+
+        if (emailUsed) throw new Error("EMAIL_EXISTS");
+      }
 
       // ✅ Update bảng users
       if (Object.keys(userFields).length > 0) {
@@ -251,7 +274,12 @@ exports.updateTeacher = async (req, res) => {
     res.json(result);
   } catch (err) {
     console.error(err.message);
-    res.status(500).json({ msg: err.message || "Server Error" });
+
+    if (err.message === "EMAIL_EXISTS") {
+      return res.status(400).json({ msg: "Email đã được sử dụng!" });
+    }
+
+    return res.status(500).json({ msg: err.message || "Server Error" });
   }
 };
 

@@ -129,6 +129,7 @@ function handleAddTeacher() {
   if (form) {
     form.reset();
     document.getElementById("teacherId").value = "";
+    document.getElementById("username").disabled = false;
   }
   openModal("Thêm giáo viên mới");
 }
@@ -144,6 +145,7 @@ async function handleEditTeacher(id) {
     document.getElementById("teacher_code").value =
       teacher.Teacher.teacher_code;
     document.getElementById("username").value = teacher.username;
+    document.getElementById("username").disabled = true;
     document.getElementById("full_name").value = teacher.full_name;
     document.getElementById("email").value = teacher.email;
     document.getElementById("phone").value = teacher.phone;
@@ -269,6 +271,15 @@ async function handleFormSubmit(event) {
     loadTeachers();
   } catch (error) {
     console.error("Lỗi khi lưu:", error);
+
+    if (error?.data?.msg) {
+      return alert("❌ " + error.data.msg);
+    }
+
+    if (error?.message) {
+      return alert("❌ " + error.message);
+    }
+
     alert("❌ Lưu thất bại!");
   }
 }
