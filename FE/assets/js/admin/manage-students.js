@@ -206,17 +206,51 @@ async function handleFormSubmit(event) {
   event.preventDefault();
 
   const id = document.getElementById("studentId").value;
+  const classId = document.getElementById("class_id").value;
 
+  const phone = document.getElementById("phone").value.trim();
+  const parentPhone = document.getElementById("parent_phone").value.trim();
+  const email = document.getElementById("email").value.trim();
+
+  // ============================
+  // ⭐ VALIDATE SỐ ĐIỆN THOẠI
+  // ============================
+  const phoneRegex = /^[0-9]{10}$/;
+
+  if (phone && !phoneRegex.test(phone)) {
+    alert("❌ Số điện thoại học sinh phải gồm đúng 10 chữ số!");
+    return;
+  }
+
+  if (parentPhone && !phoneRegex.test(parentPhone)) {
+    alert("❌ Số điện thoại phụ huynh phải gồm đúng 10 chữ số!");
+    return;
+  }
+
+  // ============================
+  // ⭐ VALIDATE EMAIL
+  // ============================
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (email && !emailRegex.test(email)) {
+    alert("❌ Email không hợp lệ! Vui lòng nhập đúng định dạng.");
+    return;
+  }
+
+  // ============================
+  // 🔥 DATA GỬI LÊN SERVER
+  // ============================
   const studentData = {
+    student_code: document.getElementById("student_code").value,
     full_name: document.getElementById("full_name").value,
     date_of_birth: document.getElementById("date_of_birth").value,
     gender: document.getElementById("gender").value,
-    class_id: Number(document.getElementById("class_id").value),
-    email: document.getElementById("email").value,
-    phone: document.getElementById("phone").value,
+    class_id: classId ? parseInt(classId, 10) : null,
+    email,
+    phone,
     address: document.getElementById("address").value,
     parent_name: document.getElementById("parent_name").value,
-    parent_phone: document.getElementById("parent_phone").value,
+    parent_phone: parentPhone,
     enrollment_date: document.getElementById("enrollment_date").value,
     status: document.getElementById("status").value,
     notes: document.getElementById("notes").value,
@@ -225,17 +259,17 @@ async function handleFormSubmit(event) {
   try {
     if (id) {
       await updateStudent(id, studentData);
-      alert("✅ Cập nhật học sinh thành công!");
+      alert("✔ Cập nhật học sinh thành công!");
     } else {
       await createStudent(studentData);
-      alert("✅ Thêm học sinh thành công!");
+      alert("✔ Thêm học sinh thành công!");
     }
 
     closeModal("studentModal");
-    loadStudents(); // reload UI
+    loadStudents();
   } catch (error) {
     console.error("❌ Lỗi khi lưu:", error);
-    alert("Lỗi khi lưu học sinh.");
+    alert("Lưu thông tin thất bại. " + (error.data?.msg || error.message));
   }
 }
 
