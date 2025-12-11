@@ -5,6 +5,15 @@ async function generateClassCode(grade) {
   const count = await Class.count({ where: { grade } });
   return `${grade}A${count + 1}`;
 }
+const { Op } = require("sequelize");
+
+function normalizeClassName(name) {
+  return name
+    .toLowerCase()
+    .replace(/^lớp\s*/g, "") // bỏ chữ "lớp"
+    .replace(/\s+/g, "") // bỏ tất cả khoảng trắng
+    .toUpperCase(); // viết hoa
+}
 
 // @desc    Get all classes
 // @route   GET /api/classes
@@ -98,12 +107,24 @@ exports.createClass = async (req, res) => {
       });
     }
 
-    // 🎯 Tự sinh mã lớp
+    // 🎯 Chuẩn hoá tên để check trùng
+    const normalized = normalizeClassName(class_name);
+
+    const exists = await Class.findOne({
+      where: { normalized_name: normalized },
+    });
+
+    if (exists) {
+      return res.status(400).json({ msg: "Tên lớp đã tồn tại!" });
+    }
+
+    // 🎯 Sinh mã lớp theo khối
     const class_code = await generateClassCode(grade);
 
     const newClass = await Class.create({
       class_code,
       class_name,
+      normalized_name: normalized,
       grade,
       school_year,
       homeroom_teacher_id: homeroom_teacher_id || null,
@@ -125,26 +146,35 @@ exports.createClass = async (req, res) => {
 // @access  Admin
 exports.updateClass = async (req, res) => {
   const { id } = req.params;
-  const {
-    class_code,
-    class_name,
-    grade,
-    school_year,
-    homeroom_teacher_id,
-    room_number,
-    max_students,
-    status,
-  } = req.body;
+  const { class_name } = req.body;
 
   try {
-    let singleClass = await Class.findByPk(id);
+    const singleClass = await Class.findByPk(id);
     if (!singleClass) {
       return res.status(404).json({ msg: "Class not found" });
     }
 
-    singleClass = await singleClass.update(req.body);
+    // 🎯 Nếu có sửa class_name → check trùng
+    if (class_name) {
+      const normalized = normalizeClassName(class_name);
 
-    res.json(singleClass);
+      const exists = await Class.findOne({
+        where: {
+          normalized_name: normalized,
+          id: { [Op.ne]: id },
+        },
+      });
+
+      if (exists) {
+        return res.status(400).json({ msg: "Tên lớp đã tồn tại!" });
+      }
+
+      req.body.normalized_name = normalized;
+    }
+
+    const updated = await singleClass.update(req.body);
+
+    res.json(updated);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");

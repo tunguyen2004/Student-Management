@@ -43,6 +43,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.ENUM("active", "inactive"),
         defaultValue: "active",
       },
+      normalized_name: {
+        type: DataTypes.STRING(50),
+        unique: true,
+      },
     },
     {
       tableName: "classes",

@@ -1,4 +1,12 @@
 // assets/js/admin/manage-classes.js
+function normalizeClassName(name) {
+  return name
+    .toLowerCase()
+    .replace(/^lớp\s*/g, "")
+    .replace(/\s+/g, "")
+    .toUpperCase();
+}
+
 function initializeClassManagement() {
   loadClasses();
 
@@ -129,7 +137,10 @@ async function handleEditClass(id) {
     if (form) {
       document.getElementById("classId").value = cls.id;
       const codeInput = document.getElementById("class_code");
-      if (codeInput) codeInput.value = cls.class_code;
+      if (codeInput) {
+        codeInput.value = cls.class_code;
+        codeInput.disabled = true; // 🚀 THÊM DÒNG NÀY
+      }
       document.getElementById("class_name").value = cls.class_name;
       document.getElementById("grade").value = cls.grade;
       document.getElementById("school_year").value = cls.school_year;
@@ -152,13 +163,20 @@ async function handleFormSubmit(event) {
   event.preventDefault();
   const id = document.getElementById("classId").value;
 
+  // Chuẩn hóa tên lớp
+  let className = document.getElementById("class_name").value.trim();
+  if (!className) return alert("❌ Vui lòng nhập tên lớp!");
+
+  const normalized = normalizeClassName(className); // 🚀 thêm chuẩn hóa
+
+  const maxStudents = document.getElementById("max_students").value;
   const homeroomTeacherId = document.getElementById(
     "homeroom_teacher_id"
   ).value;
-  const maxStudents = document.getElementById("max_students").value;
 
   const classData = {
-    class_name: document.getElementById("class_name").value,
+    class_name: className,
+    normalized_name: normalized, // 🚀 gửi lên BE
     grade: document.getElementById("grade").value,
     school_year: document.getElementById("school_year").value,
     room_number: document.getElementById("room_number").value,
@@ -175,11 +193,21 @@ async function handleFormSubmit(event) {
       await createClass(classData);
       alert("Thêm lớp học thành công!");
     }
+
     closeModal("classModal");
     loadClasses();
   } catch (error) {
     console.error("Lỗi khi lưu thông tin lớp học:", error);
-    alert("Lưu thông tin thất bại. " + error.message);
+
+    if (error?.data?.msg) {
+      return alert("❌ " + error.data.msg);
+    }
+
+    if (error?.message) {
+      return alert("❌ " + error.message);
+    }
+
+    alert("❌ Lưu thông tin thất bại.");
   }
 }
 
